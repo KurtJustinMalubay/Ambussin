@@ -1,22 +1,13 @@
 package main.models;
 
-public class Vehicle {
-    private String VehicleID;
+public abstract class Vehicle {
+    private String vehicleID;
     private String type;
-    private int capacity;
-    private String seatList;
 
-    public Vehicle(){
-
+    public Vehicle(String vehicleID, String type) {
+        this.vehicleID = vehicleID;
+        this.type = type;
     }
-    public void generateSeatMap(){
-
-    }
-    public String getAvailableSeat(){
-
-    return "hehe";
-    }
-    public String getSeatNumber(){
-        return "A";
-    }
+    public String getVehicleID() {return vehicleID;}
+    public String getType() {return type;}
 }
