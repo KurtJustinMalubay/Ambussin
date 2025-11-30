@@ -2,12 +2,10 @@ package main.models;
 
 public abstract class Vehicle {
     private String vehicleID;
-    private String type;
 
-    public Vehicle(String vehicleID, String type) {
+    public Vehicle(String vehicleID) {
         this.vehicleID = vehicleID;
-        this.type = type;
     }
     public String getVehicleID() {return vehicleID;}
-    public String getType() {return type;}
+    public abstract String getVehicleType();
 }
