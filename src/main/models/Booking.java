@@ -26,8 +26,6 @@ public class Booking {
 
         this.totalFare = calculateFare();
     }
-
-
     public double calculateFare() {
         double basePrice = route.getPrice();
         if (seat.isPwd()) {
@@ -37,7 +35,6 @@ public class Booking {
         }
         return basePrice;
     }
-
     public void confirm() {
         if (seat.isAvailable()) {
             this.status = "CONFIRMED";
@@ -48,7 +45,6 @@ public class Booking {
             this.status = "FAILED";
         }
     }
-
     public String generateTicket() {
         if (!this.status.equals("CONFIRMED")) {
             return "Ticket not generated. Booking status: " + this.status;
@@ -58,7 +54,7 @@ public class Booking {
         ticket.append("Booking ID:  ").append(bookingID).append("\n");
         ticket.append("Date:        ").append(bookingDate).append("\n");
         ticket.append("Passenger:   ").append(passenger.getName()).append("\n");
-        ticket.append("Route:       ").append(route.getSource()).append(" -> ").append(route.getDestination()).append("\n");
+        ticket.append("Route:       ").append(route.getOrigin()).append(" -> ").append(route.getDestination()).append("\n");
         ticket.append("Seat No:     ").append(seat.getSeatNumber()).append("\n");
         ticket.append("Total Fare:  $").append(totalFare).append("\n");
         return ticket.toString();

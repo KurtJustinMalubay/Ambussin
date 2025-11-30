@@ -5,13 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="294d11bc-7b2f-4224-ac9d-ac8338eea70f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Ambussin_Capstone.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Ambussin/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/models/Booking.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/models/Booking.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/models/Route.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/models/Route.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/models/Seat.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/models/Seat.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/models/Vehicle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/models/Vehicle.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -23,7 +23,7 @@ public class Route {
     public double getPrice() {
         return baseFare;
     }
-    public String getSource() {
+    public String getOrigin() {
         return origin;
     }
     public String getDestination() {
