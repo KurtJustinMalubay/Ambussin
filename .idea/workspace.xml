@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="294d11bc-7b2f-4224-ac9d-ac8338eea70f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Ambussin_Capstone.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Ambussin/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/models/Booking.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/models/Booking.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/models/Route.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/models/Route.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/models/Seat.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/models/Seat.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/models/Vehicle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/models/Vehicle.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 7
+}]]></component>
+  <component name="ProjectId" id="36BFLpl1oJks6TcBm1dHcizhcRQ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "Backend-Logics",
+    "kotlin-language-version-configured": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="Ambussin_Capstone" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="Ambussin_Capstone" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="294d11bc-7b2f-4224-ac9d-ac8338eea70f" name="Changes" comment="" />
+      <created>1764472005418</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1764472005418</updated>
+    </task>
+    <servers />
+  </component>
+</project>
