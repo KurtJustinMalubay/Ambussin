@@ -4,20 +4,35 @@ public class Seat {
     private String seatNumber;
     private boolean status;
 
-    public Seat(){
-
+    public Seat(String seatNumber) {
+        this.seatNumber = seatNumber;
+        this.status = true; // available
     }
 
-    public void reserve(){
-
+    public String getSeatNumber() {
+        return seatNumber;
     }
 
-    public void release(){
+    public boolean reserve(){
+        if(!status){
+            return false;
+        }
+        status = false;
+        return true;
+    }
 
+    public boolean release(){
+        if(status){
+            return false;
+        }
+        status = true;
+        return true;
     }
     public boolean isAvailable(){
-
-        return false;
+        return status;
     }
 
+    public String statusMessage(){
+        return status ? "Available" : "Not Available";
+    }
 }
