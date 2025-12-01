@@ -7,7 +7,6 @@ public class Vehicle {
     private String vehicleID;
     private String type;
     private int capacity;
-
     private List<Seat> seats;
 
     public Vehicle(String vehicleID, String type, int capacity) {
@@ -25,7 +24,6 @@ public class Vehicle {
     }
     public String getAvailableSeat() {
         StringBuilder availableSeats = new StringBuilder();
-
         for (Seat seat : seats) {
             if (seat.isAvailable()) {
                 availableSeats.append(seat.getSeatNumber()).append(", ");
