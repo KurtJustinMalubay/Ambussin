@@ -19,8 +19,8 @@ import java.util.List;
 public class BusBookingApp extends JFrame {
 
     // --- COLOR PALETTE ---
-    private static final Color PRIMARY_COLOR = new Color(50, 150, 200); // Blue
-    private static final Color BACKGROUND_COLOR = new Color(245, 248, 250); // Light Gray/Blue
+    private static final Color PRIMARY_COLOR = new Color(203, 171, 84); //Yellow Button
+    private static final Color BACKGROUND_COLOR = new Color(94, 17, 37); //Maroon
     private static final Color CARD_BACKGROUND = Color.WHITE;
     private static final Color ACCENT_COLOR = new Color(255, 100, 100); // Red for highlights
     private static final Font TITLE_FONT = new Font("Arial", Font.BOLD, 36);
@@ -41,7 +41,6 @@ public class BusBookingApp extends JFrame {
     private JComboBox<String> dateDropdown;
     private JTextField originField;
     private JTextField destinationField;
-    private JComboBox<String> timeDropdown;
 
     // UI elements to update on the Confirmation page
     private JTable scheduleTable;
@@ -67,7 +66,6 @@ public class BusBookingApp extends JFrame {
         originField = new JTextField(15);
         destinationField = new JTextField(15);
         dateDropdown = createDateDropdown();
-        timeDropdown = createTimeDropdown();
 
         // Initialize dynamic labels/table
         scheduleTable = new JTable();
@@ -105,11 +103,6 @@ public class BusBookingApp extends JFrame {
         return new JComboBox<>(dates.toArray(new String[0]));
     }
 
-    private JComboBox<String> createTimeDropdown() {
-        // Simple list of common departure times
-        String[] times = {"07:00 AM", "08:30 AM", "10:00 AM", "11:30 AM", "01:00 PM", "02:30 PM"};
-        return new JComboBox<>(times);
-    }
 
 
     // --- SCREEN IMPLEMENTATIONS ---
@@ -120,6 +113,7 @@ public class BusBookingApp extends JFrame {
 
         JLabel title = new JLabel("AMBUSSIN", SwingConstants.CENTER);
         title.setFont(TITLE_FONT);
+        title.setForeground(new Color(0xcbac54));
         title.setBorder(new EmptyBorder(30, 0, 50, 0));
         panel.add(title, BorderLayout.NORTH);
 
@@ -128,11 +122,12 @@ public class BusBookingApp extends JFrame {
 
         JLabel sceneryLabel = new JLabel("Your Next Journey Starts Here!", SwingConstants.CENTER);
         sceneryLabel.setFont(new Font("Arial", Font.ITALIC, 28));
+        sceneryLabel.setForeground(new Color(0xcbac54));
 
         JButton travelNowButton = new JButton("Travel Now!");
         travelNowButton.setFont(BUTTON_FONT);
         travelNowButton.setBackground(PRIMARY_COLOR);
-        travelNowButton.setForeground(Color.WHITE);
+        travelNowButton.setForeground(new Color(0x511c0a));
         travelNowButton.setFocusPainted(false);
         travelNowButton.setBorder(BorderFactory.createEmptyBorder(15, 30, 15, 30));
         travelNowButton.addActionListener(e -> cardLayout.show(cardPanel, PLACING_ORDER));
@@ -176,9 +171,6 @@ public class BusBookingApp extends JFrame {
         formPanel.add(new JLabel("Select Date:", JLabel.RIGHT));
         formPanel.add(dateDropdown);
 
-        // Label 2: Time (NOW A DROPDOWN)
-        formPanel.add(new JLabel("Departure Time:", JLabel.RIGHT));
-        formPanel.add(timeDropdown);
 
         // Label 3: Origin
         formPanel.add(new JLabel("Origin:", JLabel.RIGHT));
@@ -217,7 +209,6 @@ public class BusBookingApp extends JFrame {
         String origin = originField.getText().trim();
         String destination = destinationField.getText().trim();
         String date = (String) dateDropdown.getSelectedItem();
-        String time = (String) timeDropdown.getSelectedItem();
 
         if (origin.isEmpty() || destination.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter both Origin and Destination.", "Input Error", JOptionPane.ERROR_MESSAGE);
@@ -228,7 +219,7 @@ public class BusBookingApp extends JFrame {
 
         // 1. Get Schedules (Mock data)
         Object[][] newScheduleData = {
-                {time, "Deluxe (R001)", date},
+                {"Deluxe (R001)", date},
                 {"1 hour later", "Standard (R002)", date},
                 {"2 hours later", "Deluxe (R001)", date}
         };
@@ -393,7 +384,7 @@ public class BusBookingApp extends JFrame {
                         "<h3 style='color: #ff6464; text-align: center;'>Total Paid: %s</h3>" +
                         "<p style='font-size: 10px; text-align: center;'>Thank you for choosing Ambussin!</p>" +
                         "</body></html>",
-                bookingId, route, timeDropdown.getSelectedItem() + " (" + dateDropdown.getSelectedItem() + ")", seat, fare
+                bookingId, route + " (" + dateDropdown.getSelectedItem() + ")", seat, fare
         );
 
         // Display the ticket in a custom JDialog
