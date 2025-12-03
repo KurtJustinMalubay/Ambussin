@@ -658,6 +658,7 @@ public class BusBookingApp extends JFrame {
         p.add(new JLabel(text));
         return p;
     }
+    //connect
     //help
 
     // --- CUSTOM BUTTON CLASS FOR MODERN LOOK ---
