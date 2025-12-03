@@ -677,6 +677,7 @@ public class BusBookingApp extends JFrame {
                 public void mouseExited(MouseEvent e) { setBackground(COL_PRIMARY); repaint(); }
             });
         }
+        // hell yeah dooders
 
         @Override
         protected void paintComponent(Graphics g) {
@@ -686,6 +687,7 @@ public class BusBookingApp extends JFrame {
             g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
             super.paintComponent(g);
             g2.dispose();
+
         }
     }
 }
