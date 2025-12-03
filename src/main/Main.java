@@ -2,7 +2,7 @@ package main;
 
 import javax.swing.*;
 import javax.swing.SwingUtilities;
-import com.ambussin.BusBookingApp;  // Make sure to import the GUI class
+import com.ambussin.BusBookingApp;
 
 public class Main {
 
