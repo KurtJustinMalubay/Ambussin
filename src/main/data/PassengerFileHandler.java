@@ -1,11 +1,11 @@
-package data;
+package main.data;
 
 import main.models.Passenger;
 import java.io.*;
 import java.util.*;
 
 public class PassengerFileHandler {
-    private static final String FILE_PATH = "passengers.txt";
+    private static final String FILE_PATH = "src/main/data/passengers.txt" ;
 
     public static void savePassenger(Passenger passenger) {
         try(BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH, true))){
@@ -17,6 +17,7 @@ public class PassengerFileHandler {
     }
     public static List<Passenger> loadPassengers() {
         List<Passenger> passengers = new ArrayList<>();
+
 
         try (BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
             String line;
