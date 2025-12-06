@@ -272,13 +272,13 @@ public class BussBookingGUI extends JFrame {
         summaryPriceLabel.setText("PHP " + String.format("%.2f", currentBooking.getTotalFare()));
     }
 
+    //KA JOEL CODE
     private void confirmBookingAndShowTicket() {
         if (currentBooking != null) {
             currentBooking.confirm();
             String selectedDate = (String) travelDateDropdown.getSelectedItem();
             currentRoute.getVehicleObject().saveBooking(selectedDate, currentSeat.getSeatNumber());
         }
-
         // Generate Ticket HTML
         String rawTicket = currentBooking.generateTicket().replace("\n", "<br>");
         String html = String.format("<html><div style='font-family:monospace; width:300px; padding:10px;'>" +
@@ -330,8 +330,8 @@ public class BussBookingGUI extends JFrame {
     }
 
     private void addAutoComplete(JComboBox<String> comboBox) {
-        final DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) comboBox.getModel();
-        final JTextField editor = (JTextField) comboBox.getEditor().getEditorComponent();
+        DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) comboBox.getModel();
+        JTextField editor = (JTextField) comboBox.getEditor().getEditorComponent();
 
         editor.addKeyListener(new KeyAdapter() {
             @Override
