@@ -10,7 +10,6 @@ public class Passenger {
         this.age = age;
         this.passengerType = passengerType;
     }
-
     public String getName() {
         return name;
     }
@@ -21,7 +20,6 @@ public class Passenger {
         return passengerType;
     }
 
-
     public double getDiscountRate(){
         String type = passengerType.toLowerCase();
         if(type.equals("pwd") || type.equals("senior") || type.equals("student")){
@@ -30,7 +28,6 @@ public class Passenger {
         return 0.0;
 
     }
-
     public String toString() {
         return "Name: " + name + "\n" +
                 "Age: " + age + "\n" +

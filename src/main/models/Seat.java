@@ -2,37 +2,53 @@ package main.models;
 
 public class Seat {
     private String seatNumber;
-    private boolean status;
+    private boolean isAvailable;
+    private boolean isStudent;
+    private boolean isPwd;
 
     public Seat(String seatNumber) {
         this.seatNumber = seatNumber;
-        this.status = true; // available
+        this.isAvailable = true;
+        this.isStudent = false;
+        this.isPwd = false;
     }
-
     public String getSeatNumber() {
         return seatNumber;
     }
-
-    public boolean reserve(){
-        if(!status){
-            return false;
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+    public void setAvailable(boolean available) {
+        this.isAvailable = available;
+    }
+    public boolean isStudent() {
+        return isStudent;
+    }
+    public boolean isPwd() {
+        return isPwd;
+    }
+    public void setPassengerType(String type) {
+        switch (type) {
+            case "STUDENT":
+                this.isStudent = true;
+                this.isPwd = false;
+                break;
+            case "PWD":
+                this.isPwd = true;
+                this.isStudent = false;
+                break;
+            default:
+                this.isStudent = false;
+                this.isPwd = false;
         }
-        status = false;
-        return true;
     }
 
-    public boolean release(){
-        if(status){
-            return false;
-        }
-        status = true;
-        return true;
+    public void reserve() {
+        this.isAvailable = false;
     }
-    public boolean isAvailable(){
-        return status;
-    }
-
-    public String statusMessage(){
-        return status ? "Available" : "Not Available";
+    public void release() {
+        this.isAvailable = true;
+        this.isStudent = false;
+        this.isPwd = false;
     }
 }

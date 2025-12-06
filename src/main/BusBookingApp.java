@@ -1,10 +1,10 @@
-package com.ambussin;
+package main;
+
+import main.models.*; // IMPORTING THE BACKEND MODELS
 
 import javax.swing.*;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
@@ -14,18 +14,17 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BusBookingApp extends JFrame {
 
     // --- THEME CONSTANTS ---
-    // ts so fucking hard to deal with gng
-    // pwede raman guro dili ni ninyo studyhan, inig ask ni sir kay pwede ra ako mo answer kay ako man gabuhat sa gui
-    private static final Color COL_PRIMARY = new Color(203, 171, 84);    // Yellow
-    private static final Color COL_PRIMARY_DARK = new Color(163, 131, 50); // Darker Yellow for hover
-    private static final Color COL_BACKGROUND = new Color(94, 17, 37);   // Maroon
-    private static final Color COL_LIGHT_BG = new Color(245, 245, 245);  // Light Grey for panels
+    private static final Color COL_PRIMARY = new Color(203, 171, 84);
+    private static final Color COL_PRIMARY_DARK = new Color(163, 131, 50);
+    private static final Color COL_BACKGROUND = new Color(94, 17, 37);
+    private static final Color COL_LIGHT_BG = new Color(245, 245, 245);
     private static final Color COL_TEXT_DARK = new Color(50, 50, 50);
-    private static final Color COL_ACCENT = new Color(220, 53, 69);      // Red for price/alerts
+    private static final Color COL_ACCENT = new Color(220, 53, 69);
 
     // --- FONTS ---
     private static final Font FONT_HEADER = new Font("Segoe UI", Font.BOLD, 28);
@@ -43,36 +42,46 @@ public class BusBookingApp extends JFrame {
     private JPanel cardPanel;
     private CardLayout cardLayout;
 
-    // --- DATA FIELDS ---
+    // --- FRONTEND DATA FIELDS ---
     private JComboBox<String> dateDropdown;
-    private JTextField nameField; // NEW: Passenger Name
+    private JTextField nameField;
     private JTextField originField;
     private JTextField destinationField;
+    // Added a dropdown to utilize the Passenger Backend Logic (Discounts)
+    private JComboBox<String> typeDropdown;
 
     // --- DYNAMIC UI ELEMENTS ---
     private JTable scheduleTable;
     private JLabel routeEstimateLabel;
     private JLabel totalFareLabel;
     private JLabel routeMapLabel;
+    private JPanel busSeatPanel; // Made this a class field to update it dynamically
 
     // --- DETAILS SCREEN LABELS ---
-    private JLabel detailsNameLabel; // NEW
+    private JLabel detailsNameLabel;
     private JLabel detailsRouteLabel;
     private JLabel detailsSeatLabel;
     private JLabel detailsFareLabel;
 
-    // --- LOGIC VARIABLES ---
-    private String selectedSeatNumber = null;
-    private List<JButton> seatButtons = new ArrayList<>();
+    // --- BACKEND CONNECTION VARIABLES ---
+    // This list acts as our "Database"
+    private List<Route> allRoutes = new ArrayList<>();
+
+    // Variables to hold the state of the current transaction
+    private Route currentRoute;
+    private Seat currentSeat;
+    private Booking currentBooking;
 
     public BusBookingApp() {
         setTitle("AMBUSSIN Bus Booking System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1100, 750);
         setLocationRelativeTo(null);
-
-        // using a slight styling tweak for the flame guys
         setBackground(Color.WHITE);
+
+        // --- 1. INITIALIZE BACKEND DATA ---
+        // We generate the routes and vehicles before building the UI
+        initializeBackendData();
 
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
@@ -83,9 +92,13 @@ public class BusBookingApp extends JFrame {
         destinationField = createStyledTextField();
         dateDropdown = createDateDropdown();
 
+        // Passenger Type for Backend Discount Logic
+        typeDropdown = new JComboBox<>(new String[]{"REGULAR", "STUDENT", "SENIOR", "PWD"});
+        typeDropdown.setBackground(Color.WHITE);
+
         // Initialize Labels
         scheduleTable = new JTable();
-        styleTable(scheduleTable); // Custom styling method
+        styleTable(scheduleTable);
 
         routeEstimateLabel = new JLabel("ETA: ---", SwingConstants.CENTER);
         routeEstimateLabel.setFont(FONT_BODY_BOLD);
@@ -112,7 +125,27 @@ public class BusBookingApp extends JFrame {
     }
 
     // =================================================================================
-    // 1. LANDING PAGE (Modern Splash Screen)
+    //  BACKEND INITIALIZATION (The "Database")
+    // =================================================================================
+    private void initializeBackendData() {
+        // Create Vehicles with different capacities and types
+        Vehicle v1 = new Vehicle("BUS-101", "Aircon", 45);
+        Vehicle v2 = new Vehicle("BUS-102", "Non-Aircon", 50);
+        Vehicle v3 = new Vehicle("BUS-103", "Deluxe Sleeper", 30);
+
+        // Pre-book some seats in the backend to show it works
+        // v1.findSeat("3").reserve(); // Example of booking seat 3 in the code
+
+        // Create Routes linking to Vehicles
+        // Route(ID, Origin, Dest, BasePrice, Vehicle)
+        allRoutes.add(new Route("R01", "Cebu", "Manila", 1500.0, v1));
+        allRoutes.add(new Route("R02", "Cebu", "Davao", 1200.0, v2));
+        allRoutes.add(new Route("R03", "Manila", "Baguio", 800.0, v3));
+        allRoutes.add(new Route("R04", "Cebu", "Manila", 1800.0, v3)); // Different bus, same route
+    }
+
+    // =================================================================================
+    // 1. LANDING PAGE
     // =================================================================================
     private JPanel createLandingPage() {
         JPanel panel = new JPanel(new GridBagLayout());
@@ -134,7 +167,6 @@ public class BusBookingApp extends JFrame {
         startBtn.setFont(new Font("Segoe UI", Font.BOLD, 20));
         startBtn.addActionListener(e -> cardLayout.show(cardPanel, PLACING_ORDER));
 
-        // Layout centering
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0; gbc.gridy = 0;
         panel.add(logo, gbc);
@@ -146,7 +178,6 @@ public class BusBookingApp extends JFrame {
         gbc.gridy = 2;
         panel.add(startBtn, gbc);
 
-        // Decorative footer
         JLabel footer = new JLabel("© 2025 Ambussin Transport Inc.", SwingConstants.CENTER);
         footer.setForeground(new Color(255, 255, 255, 100));
         gbc.gridy = 3;
@@ -157,7 +188,7 @@ public class BusBookingApp extends JFrame {
     }
 
     // =================================================================================
-    // 2. SEARCH PAGE (Clean Form)
+    // 2. SEARCH PAGE
     // =================================================================================
     private JPanel createSearchPage() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -166,7 +197,6 @@ public class BusBookingApp extends JFrame {
         JPanel centerPanel = new JPanel(new GridBagLayout());
         centerPanel.setBackground(COL_LIGHT_BG);
 
-        // White Card Container
         JPanel formCard = new JPanel(new GridBagLayout());
         formCard.setBackground(Color.WHITE);
         formCard.setBorder(BorderFactory.createCompoundBorder(
@@ -179,10 +209,14 @@ public class BusBookingApp extends JFrame {
         gbc.insets = new Insets(10, 0, 10, 0);
         gbc.gridx = 0; gbc.gridy = 0;
 
-        // Input Fields
         formCard.add(createLabel("Passenger Name"), gbc);
         gbc.gridy++;
         formCard.add(nameField, gbc);
+
+        gbc.gridy++;
+        formCard.add(createLabel("Passenger Type"), gbc); // Added for Discount Logic
+        gbc.gridy++;
+        formCard.add(typeDropdown, gbc);
 
         gbc.gridy++;
         formCard.add(createLabel("Travel Date"), gbc);
@@ -190,16 +224,15 @@ public class BusBookingApp extends JFrame {
         formCard.add(dateDropdown, gbc);
 
         gbc.gridy++;
-        formCard.add(createLabel("Origin"), gbc);
+        formCard.add(createLabel("Origin (e.g., Cebu)"), gbc);
         gbc.gridy++;
         formCard.add(originField, gbc);
 
         gbc.gridy++;
-        formCard.add(createLabel("Destination"), gbc);
+        formCard.add(createLabel("Destination (e.g., Manila)"), gbc);
         gbc.gridy++;
         formCard.add(destinationField, gbc);
 
-        // Search Button
         gbc.gridy++;
         gbc.insets = new Insets(30, 0, 0, 0);
         RoundedButton searchBtn = new RoundedButton("SEARCH SCHEDULES");
@@ -217,46 +250,69 @@ public class BusBookingApp extends JFrame {
             return;
         }
 
-        // Reset
-        selectedSeatNumber = null;
-        resetSeatColors();
+        // --- BACKEND CONNECTION: Filter Routes ---
+        String inputOrigin = originField.getText().trim();
+        String inputDest = destinationField.getText().trim();
 
-        // Mock Data
-        String date = (String) dateDropdown.getSelectedItem();
-        Object[][] data = {
-                {"08:00 AM", "Airconditioner (R001)", date},
-                {"10:00 AM", "Non-Airconditioner (R002)", date},
-                {"01:00 PM", "Airconditioner (R001)", date},
-                {"03:30 PM", "Deluxe Sleeper (R005)", date}
-        };
-        scheduleTable.setModel(new DefaultTableModel(data, new String[]{"TIME", "BUS TYPE", "DATE"}));
+        // Java Streams to filter the list of routes based on user input (Case Insensitive)
+        List<Route> foundRoutes = allRoutes.stream()
+                .filter(r -> r.getOrigin().equalsIgnoreCase(inputOrigin) &&
+                        r.getDestination().equalsIgnoreCase(inputDest))
+                .collect(Collectors.toList());
 
-        // Mock Map Text
-        String origin = originField.getText().toUpperCase();
-        String dest = destinationField.getText().toUpperCase();
+        if (foundRoutes.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No routes found for " + inputOrigin + " to " + inputDest, "No Schedules", JOptionPane.INFORMATION_MESSAGE);
+            // Optional: for testing, if input is empty, maybe show all routes?
+            // For now, we return.
+            return;
+        }
+
+        // Reset Selection
+        currentRoute = null;
+        currentSeat = null;
+        currentBooking = null;
+
+        // Populate Table with Found Routes
+        // We store the Route ID in the table so we can retrieve the object later
+        DefaultTableModel model = new DefaultTableModel(new String[]{"ID", "TIME", "BUS INFO", "PRICE"}, 0);
+
+        for (Route r : foundRoutes) {
+            model.addRow(new Object[]{
+                    r.getRouteInfo().split("\\[")[1].split("\\]")[0], // Extract ID nicely
+                    "08:00 AM", // Mock time (Backend Route doesn't have time yet, simple fix)
+                    r.getVehicle(),
+                    String.format("%.2f", r.getBaseFare())
+            });
+        }
+
+        scheduleTable.setModel(model);
+
+        // Update Map Text
         routeMapLabel.setText("<html><div style='text-align:center;'>" +
-                "<h2 style='color:#5e1125'>" + origin + " <span style='color:#cbab54'>➝</span> " + dest + "</h2>" +
-                "<i>Calculating optimal route...</i><br><br>" +
-                "<b>Distance:</b> 45 km &nbsp;|&nbsp; <b>Traffic:</b> Moderate" +
+                "<h2 style='color:#5e1125'>" + inputOrigin.toUpperCase() + " <span style='color:#cbab54'>➝</span> " + inputDest.toUpperCase() + "</h2>" +
+                "<i>Select a schedule to view seats...</i>" +
                 "</div></html>");
 
-        totalFareLabel.setText("Select a schedule to view fare");
+        totalFareLabel.setText("Select a schedule");
+
+        // Reset the visual seat map (make it empty until row selected)
+        if(busSeatPanel != null) busSeatPanel.removeAll();
 
         cardLayout.show(cardPanel, CONFIRMATION_REVIEW);
     }
 
     // =================================================================================
-    // 3. SELECTION PAGE (Split View)
+    // 3. SELECTION PAGE
     // =================================================================================
     private JPanel createSelectionPage() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(createTopBar("Select Schedule & Seat"), BorderLayout.NORTH);
 
-        JPanel content = new JPanel(new GridLayout(1, 2, 20, 0)); // 2 Columns
+        JPanel content = new JPanel(new GridLayout(1, 2, 20, 0));
         content.setBackground(COL_LIGHT_BG);
         content.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // LEFT COLUMN: Schedule & Map
+        // LEFT COLUMN
         JPanel leftPanel = new JPanel(new BorderLayout(0, 20));
         leftPanel.setOpaque(false);
 
@@ -268,12 +324,19 @@ public class BusBookingApp extends JFrame {
         mapContainer.add(routeMapLabel, BorderLayout.CENTER);
         mapContainer.add(routeEstimateLabel, BorderLayout.SOUTH);
 
-        leftPanel.add(scheduleContainer, BorderLayout.CENTER); // Takes most space
+        leftPanel.add(scheduleContainer, BorderLayout.CENTER);
         leftPanel.add(mapContainer, BorderLayout.SOUTH);
 
-        // RIGHT COLUMN: Visual Bus Seat Map
+        // RIGHT COLUMN
         JPanel rightPanel = createStyledPanel("SELECT YOUR SEAT");
-        rightPanel.add(createVisualBusLayout(), BorderLayout.CENTER);
+
+        // Initialize the panel that holds the buttons
+        busSeatPanel = new JPanel(new GridBagLayout());
+        busSeatPanel.setBackground(Color.WHITE);
+
+        JScrollPane scroll = new JScrollPane(busSeatPanel); // Scrollable seat map
+        scroll.setBorder(null);
+        rightPanel.add(scroll, BorderLayout.CENTER);
 
         JPanel farePanel = new JPanel(new BorderLayout());
         farePanel.setBackground(Color.WHITE);
@@ -292,103 +355,131 @@ public class BusBookingApp extends JFrame {
         return panel;
     }
 
-    private JPanel createVisualBusLayout() {
-        JPanel busPanel = new JPanel(new GridBagLayout());
-        busPanel.setBackground(Color.WHITE);
+    // --- LOGIC: Update Seat Map based on Backend Vehicle ---
+    private void updateSeatMap(Vehicle vehicle) {
+        busSeatPanel.removeAll(); // Clear old buttons
 
-        // Driver Seat Indicator
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = 5;
         gbc.insets = new Insets(0,0,15,0);
+
         JLabel driver = new JLabel("DRIVER", SwingConstants.CENTER);
         driver.setOpaque(true);
         driver.setBackground(Color.LIGHT_GRAY);
         driver.setPreferredSize(new Dimension(200, 30));
-        busPanel.add(driver, gbc);
+        busSeatPanel.add(driver, gbc);
 
-        // Seat Grid (2 - Aisle - 2)
         gbc.gridwidth = 1;
         gbc.insets = new Insets(4, 4, 4, 4);
 
-        int seatCount = 1;
-        for (int row = 0; row < 10; row++) {
+        int seatIndex = 1;
+        // Simple 4-column layout logic (2-aisle-2)
+        // We loop until we reach the capacity of the backend vehicle
+        int capacity = 50; // Max visual limit
+
+        for (int row = 0; row < 12; row++) {
             for (int col = 0; col < 5; col++) {
                 gbc.gridx = col;
                 gbc.gridy = row + 1;
 
                 if (col == 2) {
-                    // Aisle (Empty space)
-                    busPanel.add(Box.createHorizontalStrut(20), gbc);
+                    busSeatPanel.add(Box.createHorizontalStrut(20), gbc);
                 } else {
-                    // Seat Button
-                    JButton seat = new JButton(String.valueOf(seatCount));
-                    styleSeatButton(seat);
+                    // Check if we have exceeded this bus's actual capacity
+                    String seatNumStr = String.valueOf(seatIndex);
+                    Seat backendSeat = vehicle.findSeat(seatNumStr);
 
-                    // Mock Logic: seat 3, 15, 22 are booked
-                    if(seatCount == 3 || seatCount == 15 || seatCount == 22) {
-                        seat.setBackground(new Color(220, 220, 220)); // Grey
-                        seat.setEnabled(false);
-                        seat.setBorder(new LineBorder(Color.GRAY));
-                    } else {
-                        seatButtons.add(seat); // Track available seats
-                        seat.addActionListener(e -> {
-                            resetSeatColors();
-                            seat.setBackground(COL_PRIMARY);
-                            seat.setForeground(COL_BACKGROUND);
-                            selectedSeatNumber = seat.getText();
-                        });
+                    if (backendSeat != null) {
+                        JButton seatBtn = new JButton(seatNumStr);
+                        styleSeatButton(seatBtn);
+
+                        // --- BACKEND CHECK: Is seat available? ---
+                        if (!backendSeat.isAvailable()) {
+                            seatBtn.setBackground(Color.LIGHT_GRAY);
+                            seatBtn.setEnabled(false); // Disable booked seats
+                            seatBtn.setToolTipText("Already Booked");
+                        } else {
+                            // Add click listener
+                            seatBtn.addActionListener(e -> {
+                                // Reset all other green buttons
+                                for(Component c : busSeatPanel.getComponents()) {
+                                    if(c instanceof JButton && c.isEnabled()) {
+                                        c.setBackground(new Color(153, 255, 153));
+                                        c.setForeground(new Color(0, 100, 0));
+                                    }
+                                }
+                                // Highlight selected
+                                seatBtn.setBackground(COL_PRIMARY);
+                                seatBtn.setForeground(COL_BACKGROUND);
+
+                                // Store selected backend seat
+                                currentSeat = backendSeat;
+                                calculateTemporaryFare(); // Update price label
+                            });
+                        }
+                        busSeatPanel.add(seatBtn, gbc);
                     }
-
-                    busPanel.add(seat, gbc);
-                    seatCount++;
+                    seatIndex++;
                 }
             }
         }
+        busSeatPanel.revalidate();
+        busSeatPanel.repaint();
+    }
 
-        JScrollPane scroll = new JScrollPane(busPanel);
-        scroll.setBorder(null);
+    // --- LOGIC: Calculate Fare using Backend Models before booking ---
+    private void calculateTemporaryFare() {
+        if (currentRoute == null || currentSeat == null) return;
 
-        JPanel wrapper = new JPanel(new BorderLayout());
-        wrapper.setOpaque(false);
-        wrapper.add(scroll, BorderLayout.CENTER);
+        // Create a temporary passenger just to get the discount rate
+        Passenger tempPass = new Passenger(nameField.getText(), 20, (String)typeDropdown.getSelectedItem());
 
-        // Legend
-        JPanel legend = new JPanel(new FlowLayout());
-        legend.setBackground(Color.WHITE);
-        legend.add(createLegendDot(new Color(153, 255, 153), "Available"));
-        legend.add(createLegendDot(Color.LIGHT_GRAY, "Booked"));
-        legend.add(createLegendDot(COL_PRIMARY, "Selected"));
-        wrapper.add(legend, BorderLayout.SOUTH);
+        // We need to set the seat type temporarily to check price
+        currentSeat.setPassengerType(tempPass.getPassengerType());
 
-        return wrapper;
+        // Create a temporary booking object just to run calculation
+        Booking tempBooking = new Booking(tempPass, currentRoute, currentSeat);
+
+        totalFareLabel.setText("Total Fare: PHP " + String.format("%.2f", tempBooking.getTotalFare()));
+
+        // Reset seat state so we don't accidentally save it yet
+        currentSeat.release();
     }
 
     private void validateAndProceed() {
-        if (scheduleTable.getSelectedRow() == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a bus schedule.", "Error", JOptionPane.ERROR_MESSAGE);
+        if (currentRoute == null) {
+            JOptionPane.showMessageDialog(this, "Please select a schedule first.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (selectedSeatNumber == null) {
+        if (currentSeat == null) {
             JOptionPane.showMessageDialog(this, "Please select a seat.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Gather Info
-        String time = scheduleTable.getValueAt(scheduleTable.getSelectedRow(), 0).toString();
-        String bus = scheduleTable.getValueAt(scheduleTable.getSelectedRow(), 1).toString();
-        String fare = totalFareLabel.getText().replace("Calculated Fare: ", "");
+        // --- BACKEND CONNECTION: Create the Real Booking ---
+        // 1. Create Passenger
+        String pName = nameField.getText();
+        String pType = (String) typeDropdown.getSelectedItem();
+        int pAge = 25; // Default age since we don't have an input field for it yet
+        Passenger passenger = new Passenger(pName, pAge, pType);
 
-        // Set Labels
-        detailsNameLabel.setText("Passenger: " + nameField.getText());
-        detailsRouteLabel.setText("<html><b>" + originField.getText().toUpperCase() + " ➝ " + destinationField.getText().toUpperCase() + "</b><br>" + time + " - " + bus + "</html>");
-        detailsSeatLabel.setText("Seat Number: " + selectedSeatNumber);
-        detailsFareLabel.setText(fare);
+        // 2. Configure Seat (Apply logic for Student/PWD)
+        currentSeat.setPassengerType(pType);
+
+        // 3. Create Booking Object
+        currentBooking = new Booking(passenger, currentRoute, currentSeat);
+
+        // Update Summary UI
+        detailsNameLabel.setText("Passenger: " + passenger.getName() + " (" + pType + ")");
+        detailsRouteLabel.setText("<html><b>" + currentRoute.getOrigin() + " ➝ " + currentRoute.getDestination() + "</b><br>" + currentRoute.getVehicle() + "</html>");
+        detailsSeatLabel.setText("Seat Number: " + currentSeat.getSeatNumber());
+        detailsFareLabel.setText("PHP " + String.format("%.2f", currentBooking.getTotalFare()));
 
         cardLayout.show(cardPanel, ORDER_DETAILS);
     }
 
     // =================================================================================
-    // 4. SUMMARY PAGE (Receipt Style)
+    // 4. SUMMARY PAGE
     // =================================================================================
     private JPanel createSummaryPage() {
         JPanel panel = new JPanel(new GridBagLayout());
@@ -405,7 +496,6 @@ public class BusBookingApp extends JFrame {
         gbc.gridx = 0; gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
 
-        // Logo
         JLabel logo = new JLabel("AMBUSSIN", SwingConstants.CENTER);
         logo.setFont(new Font("Segoe UI", Font.BOLD, 30));
         logo.setForeground(COL_BACKGROUND);
@@ -417,12 +507,10 @@ public class BusBookingApp extends JFrame {
         sub.setForeground(Color.GRAY);
         receipt.add(sub, gbc);
 
-        // Divider
         gbc.gridy++;
         gbc.insets = new Insets(20, 0, 20, 0);
         receipt.add(new JSeparator(SwingConstants.HORIZONTAL), gbc);
 
-        // Info
         gbc.insets = new Insets(5, 0, 5, 0);
         gbc.anchor = GridBagConstraints.WEST;
 
@@ -437,7 +525,6 @@ public class BusBookingApp extends JFrame {
         detailsSeatLabel.setFont(FONT_BODY);
         receipt.add(detailsSeatLabel, gbc);
 
-        // Total
         gbc.gridy++;
         gbc.insets = new Insets(30, 0, 5, 0);
         JLabel totalTxt = new JLabel("TOTAL AMOUNT");
@@ -450,7 +537,6 @@ public class BusBookingApp extends JFrame {
         detailsFareLabel.setForeground(COL_ACCENT);
         receipt.add(detailsFareLabel, gbc);
 
-        // Buttons
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.CENTER;
 
@@ -463,7 +549,7 @@ public class BusBookingApp extends JFrame {
         edit.addActionListener(e -> cardLayout.show(cardPanel, CONFIRMATION_REVIEW));
 
         RoundedButton pay = new RoundedButton("PAY & CONFIRM");
-        pay.addActionListener(e -> showTicketDialog());
+        pay.addActionListener(e -> confirmBookingAndShowTicket());
 
         btnPanel.add(edit);
         btnPanel.add(pay);
@@ -476,24 +562,32 @@ public class BusBookingApp extends JFrame {
     // =================================================================================
     // 5. SUCCESS PAGE & TICKET
     // =================================================================================
-    private void showTicketDialog() {
+    private void confirmBookingAndShowTicket() {
+        if(currentBooking != null) {
+            // --- BACKEND LOGIC: Confirm the booking ---
+            // This sets the seat to unavailable and changes status to CONFIRMED
+            currentBooking.confirm();
+        }
+
         JDialog d = new JDialog(this, "Boarding Pass", true);
-        d.setSize(500, 300);
+        d.setSize(500, 400);
         d.setLocationRelativeTo(this);
         d.setLayout(new BorderLayout());
 
         JPanel ticket = new JPanel(new GridBagLayout());
         ticket.setBackground(Color.WHITE);
 
-        String html = String.format("<html><div style='font-family:sans-serif; width:350px; border:2px dashed gray; padding:15px;'>" +
-                        "<h2 style='color:#5e1125'>AMBUSSIN <span style='font-size:10px; color:gray'>BOARDING PASS</span></h2>" +
+        // Use the backend generateTicket() string, convert newlines to HTML for Swing
+        String rawTicket = currentBooking.generateTicket();
+        String htmlContent = rawTicket.replace("\n", "<br>");
+
+        String html = String.format("<html><div style='font-family:monospace; width:350px; border:2px dashed gray; padding:15px;'>" +
+                        "<h2 style='color:#5e1125'>AMBUSSIN TICKET</h2>" +
                         "<hr>" +
-                        "<b>Passenger:</b> %s<br>" +
-                        "<b>Route:</b> %s ➝ %s<br>" +
-                        "<b>Seat:</b> <span style='font-size:20px; color:#cbab54'>%s</span><br>" +
-                        "<br><div style='text-align:right; color:green'>PAID: %s</div>" +
+                        "%s" +
+                        "<br><div style='text-align:center; color:green; margin-top:10px;'>*** PAID ***</div>" +
                         "</div></html>",
-                nameField.getText(), originField.getText(), destinationField.getText(), selectedSeatNumber, detailsFareLabel.getText());
+                htmlContent);
 
         ticket.add(new JLabel(html));
         d.add(ticket, BorderLayout.CENTER);
@@ -523,10 +617,16 @@ public class BusBookingApp extends JFrame {
 
         RoundedButton home = new RoundedButton("BOOK ANOTHER TRIP");
         home.addActionListener(e -> {
-            // Reset fields
+            // Clear fields
             nameField.setText("");
             originField.setText("");
             destinationField.setText("");
+
+            // Clean up state
+            currentBooking = null;
+            currentRoute = null;
+            currentSeat = null;
+
             cardLayout.show(cardPanel, LANDING);
         });
 
@@ -613,55 +713,43 @@ public class BusBookingApp extends JFrame {
         table.setSelectionBackground(COL_BACKGROUND);
         table.setSelectionForeground(COL_PRIMARY);
         table.setShowVerticalLines(false);
+        table.setDefaultEditor(Object.class, null); // Make non-editable
 
         JTableHeader header = table.getTableHeader();
         header.setBackground(Color.WHITE);
         header.setFont(new Font("Segoe UI", Font.BOLD, 12));
         header.setBorder(new LineBorder(Color.LIGHT_GRAY, 0, false));
 
-        // Listener to update Fare
+        // Listener to select the Route Object
         table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && table.getSelectedRow() != -1) {
-                String type = table.getValueAt(table.getSelectedRow(), 1).toString();
-                if (type.contains("Non-Air")) totalFareLabel.setText("Calculated Fare: PHP 150.00");
-                else if (type.contains("Sleeper")) totalFareLabel.setText("Calculated Fare: PHP 450.00");
-                else totalFareLabel.setText("Calculated Fare: PHP 180.00");
+                // Get the Route ID from the hidden logic (column 0)
+                String routeID = table.getValueAt(table.getSelectedRow(), 0).toString();
+
+                // Find the backend object
+                for(Route r : allRoutes) {
+                    if(r.getRouteInfo().contains(routeID)) {
+                        currentRoute = r;
+                        // Update the map using the backend vehicle
+                        updateSeatMap(r.getVehicleObject());
+                        break;
+                    }
+                }
+                totalFareLabel.setText("Please select a seat...");
             }
         });
     }
 
     private void styleSeatButton(JButton btn) {
         btn.setPreferredSize(new Dimension(45, 45));
-        btn.setBackground(new Color(153, 255, 153)); // Light Green default
+        btn.setBackground(new Color(153, 255, 153));
         btn.setForeground(new Color(0, 100, 0));
         btn.setFocusPainted(false);
         btn.setBorder(new LineBorder(new Color(100, 200, 100)));
         btn.setFont(new Font("Arial", Font.BOLD, 10));
     }
 
-    private void resetSeatColors() {
-        for(JButton btn : seatButtons) {
-            if(btn.isEnabled()) {
-                btn.setBackground(new Color(153, 255, 153));
-                btn.setForeground(new Color(0, 100, 0));
-            }
-        }
-    }
-
-    private JPanel createLegendDot(Color c, String text) {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        p.setBackground(Color.WHITE);
-        JLabel dot = new JLabel("●");
-        dot.setForeground(c);
-        dot.setFont(new Font("Arial", Font.PLAIN, 20));
-        p.add(dot);
-        p.add(new JLabel(text));
-        return p;
-    }
-    //connect
-    //help
-
-    // --- CUSTOM BUTTON CLASS FOR MODERN LOOK ---
+    // --- CUSTOM BUTTON CLASS ---
     class RoundedButton extends JButton {
         public RoundedButton(String label) {
             super(label);
@@ -679,7 +767,6 @@ public class BusBookingApp extends JFrame {
                 public void mouseExited(MouseEvent e) { setBackground(COL_PRIMARY); repaint(); }
             });
         }
-        // hell yeah dooders
 
         @Override
         protected void paintComponent(Graphics g) {
@@ -689,7 +776,6 @@ public class BusBookingApp extends JFrame {
             g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
             super.paintComponent(g);
             g2.dispose();
-
         }
     }
 }
