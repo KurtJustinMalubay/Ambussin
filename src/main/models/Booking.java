@@ -39,9 +39,7 @@ public class Booking {
         if (seat.isAvailable()) {
             this.status = "CONFIRMED";
             seat.setAvailable(false);
-            // DISPLAY NI NATO KANANG MURAG ERROR BOX: "Booking confirmed for " + passenger.getName()
         } else {
-            // DISPLAY NI NATO KANANG MURAG ERROR BOX: "Error: Seat is already booked.";
             this.status = "FAILED";
         }
     }
@@ -55,7 +53,7 @@ public class Booking {
         ticket.append("Passenger:   ").append(passenger.getName()).append("\n");
         ticket.append("Route:       ").append(route.getOrigin()).append(" -> ").append(route.getDestination()).append("\n");
         ticket.append("Seat No:     ").append(seat.getSeatNumber()).append("\n");
-        ticket.append("Total Fare:  $").append(totalFare).append("\n");
+        ticket.append("Total Fare:  PHP").append(totalFare).append("\n");
         return ticket.toString();
     }
     public String getBookingID() { return bookingID; }

@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="main.BussBookingGUI">
+  <grid id="27dc6" binding="mainCardPanel" layout-manager="CardLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="800" height="600"/>
+    </constraints>
+    <properties>
+      <background color="-10612290"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <grid id="landingPage" layout-manager="GridLayoutManager" row-count="6" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <card name="LandingPage"/>
+        </constraints>
+        <properties>
+          <background color="-10612443"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <component id="sloganLbl" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <font name="Segoe UI" size="20" style="2"/>
+              <foreground color="-1"/>
+              <text value="Luxury Travel. Affordable Prices."/>
+            </properties>
+          </component>
+          <component id="startBtn" class="javax.swing.JButton" binding="landingStartButton" custom-create="true">
+            <constraints>
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="BOOK A TICKET"/>
+            </properties>
+          </component>
+          <component id="logoLbl" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <font name="Segoe UI" size="64" style="1"/>
+              <foreground color="-3425452"/>
+              <text value="AMBUSSIN"/>
+            </properties>
+          </component>
+          <vspacer id="db919">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </vspacer>
+          <vspacer id="598c5">
+            <constraints>
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </vspacer>
+          <vspacer id="fa412">
+            <constraints>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="1" anchor="0" fill="0" indent="0" use-parent-layout="false">
+                <minimum-size width="10" height="10"/>
+                <preferred-size width="10" height="10"/>
+                <maximum-size width="10" height="10"/>
+              </grid>
+            </constraints>
+          </vspacer>
+        </children>
+      </grid>
+      <grid id="searchPage" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints>
+          <card name="SearchPage"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="searchHeader" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints border-constraint="North"/>
+            <properties>
+              <background color="-10612443"/>
+            </properties>
+            <border type="empty">
+              <size top="15" left="20" bottom="15" right="20"/>
+            </border>
+            <children>
+              <component id="brand1" class="javax.swing.JLabel">
+                <constraints border-constraint="West"/>
+                <properties>
+                  <font name="Segoe UI" size="20" style="1"/>
+                  <foreground color="-3425452"/>
+                  <text value="AMBUSSIN"/>
+                </properties>
+              </component>
+              <component id="title1" class="javax.swing.JLabel">
+                <constraints border-constraint="East"/>
+                <properties>
+                  <foreground color="-1"/>
+                  <text value="Find Your Trip"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <grid id="searchCenter" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints border-constraint="Center"/>
+            <properties>
+              <background color="-657931"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <grid id="formPanel" layout-manager="GridLayoutManager" row-count="11" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="10">
+                <margin top="40" left="60" bottom="40" right="60"/>
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false">
+                    <minimum-size width="400" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties>
+                  <background color="-1"/>
+                </properties>
+                <border type="line"/>
+                <children>
+                  <component id="lbl1" class="javax.swing.JLabel">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="Passenger Name"/>
+                    </properties>
+                  </component>
+                  <component id="pName" class="javax.swing.JTextField" binding="passengerNameField">
+                    <constraints>
+                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                        <preferred-size width="150" height="-1"/>
+                      </grid>
+                    </constraints>
+                    <properties/>
+                  </component>
+                  <component id="lbl2" class="javax.swing.JLabel">
+                    <constraints>
+                      <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="Passenger Type"/>
+                    </properties>
+                  </component>
+                  <component id="pType" class="javax.swing.JComboBox" binding="passengerTypeDropdown">
+                    <constraints>
+                      <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties/>
+                  </component>
+                  <component id="lbl3" class="javax.swing.JLabel">
+                    <constraints>
+                      <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="Travel Date"/>
+                    </properties>
+                  </component>
+                  <component id="tDate" class="javax.swing.JComboBox" binding="travelDateDropdown">
+                    <constraints>
+                      <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties/>
+                  </component>
+                  <component id="lbl4" class="javax.swing.JLabel">
+                    <constraints>
+                      <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="Origin"/>
+                    </properties>
+                  </component>
+                  <component id="cbOrigin" class="javax.swing.JComboBox" binding="originDropdown">
+                    <constraints>
+                      <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <editable value="true"/>
+                    </properties>
+                  </component>
+                  <component id="lbl5" class="javax.swing.JLabel">
+                    <constraints>
+                      <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="Destination"/>
+                    </properties>
+                  </component>
+                  <component id="cbDest" class="javax.swing.JComboBox" binding="destinationDropdown">
+                    <constraints>
+                      <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <editable value="true"/>
+                    </properties>
+                  </component>
+                  <component id="searchBtn" class="javax.swing.JButton" binding="searchButton" custom-create="true">
+                    <constraints>
+                      <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="SEARCH SCHEDULES"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+            </children>
+          </grid>
+        </children>
+      </grid>
+      <grid id="selectionPage" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints>
+          <card name="SelectionPage"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="selHeader" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints border-constraint="North"/>
+            <properties>
+              <background color="-10612443"/>
+            </properties>
+            <border type="empty">
+              <size top="15" left="20" bottom="15" right="20"/>
+            </border>
+            <children>
+              <component id="title2" class="javax.swing.JLabel">
+                <constraints border-constraint="East"/>
+                <properties>
+                  <foreground color="-1"/>
+                  <text value="Select Schedule &amp; Seat"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <grid id="selContent" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="20" vgap="0">
+            <margin top="20" left="20" bottom="20" right="20"/>
+            <constraints border-constraint="Center"/>
+            <properties>
+              <background color="-657931"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <grid id="leftP" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <scrollpane id="tableScroll">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="schedTable" class="javax.swing.JTable" binding="scheduleTable">
+                        <constraints/>
+                        <properties/>
+                      </component>
+                    </children>
+                  </scrollpane>
+                  <component id="routeLbl" class="javax.swing.JLabel" binding="routeMapLabel">
+                    <constraints>
+                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="Route Info"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="rightP" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <background color="-1"/>
+                </properties>
+                <border type="line"/>
+                <children>
+                  <scrollpane id="seatScroll">
+                    <constraints border-constraint="Center"/>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="seatPanel" class="javax.swing.JPanel" binding="seatMapPanel" custom-create="true">
+                        <constraints/>
+                        <properties/>
+                      </component>
+                    </children>
+                  </scrollpane>
+                  <grid id="fareP" layout-manager="BorderLayout" hgap="0" vgap="0">
+                    <constraints border-constraint="South"/>
+                    <properties>
+                      <background color="-1"/>
+                    </properties>
+                    <border type="empty">
+                      <size top="10" left="10" bottom="10" right="10"/>
+                    </border>
+                    <children>
+                      <component id="totFare" class="javax.swing.JLabel" binding="totalFareLabel">
+                        <constraints border-constraint="Center"/>
+                        <properties>
+                          <font size="18" style="1"/>
+                          <horizontalAlignment value="0"/>
+                          <text value="Select a seat"/>
+                        </properties>
+                      </component>
+                      <component id="procBtn" class="javax.swing.JButton" binding="proceedButton" custom-create="true">
+                        <constraints border-constraint="South"/>
+                        <properties>
+                          <text value="PROCEED"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                </children>
+              </grid>
+            </children>
+          </grid>
+        </children>
+      </grid>
+      <grid id="summaryPage" layout-manager="GridBagLayout">
+        <constraints>
+          <card name="SummaryPage"/>
+        </constraints>
+        <properties>
+          <background color="-10612443"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <grid id="receipt" layout-manager="GridLayoutManager" row-count="7" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="10">
+            <margin top="40" left="60" bottom="40" right="60"/>
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <background color="-1"/>
+            </properties>
+            <border type="line" title=""/>
+            <children>
+              <component id="sumName" class="javax.swing.JLabel" binding="summaryNameLabel">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <font style="1"/>
+                </properties>
+              </component>
+              <component id="sumRoute" class="javax.swing.JLabel" binding="summaryRouteLabel">
+                <constraints>
+                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="sumSeat" class="javax.swing.JLabel" binding="summarySeatLabel">
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="sumPrice" class="javax.swing.JLabel" binding="summaryPriceLabel">
+                <constraints>
+                  <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <font size="36" style="1"/>
+                  <foreground color="-2347715"/>
+                </properties>
+              </component>
+              <component id="payBtn" class="javax.swing.JButton" binding="payButton" custom-create="true">
+                <constraints>
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="PAY &amp; CONFIRM"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+        </children>
+      </grid>
+      <grid id="successPage" layout-manager="GridBagLayout">
+        <constraints>
+          <card name="SuccessPage"/>
+        </constraints>
+        <properties>
+          <background color="-10612443"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <component id="homeBtn" class="javax.swing.JButton" binding="homeButton" custom-create="true">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <text value="BOOK ANOTHER TRIP"/>
+            </properties>
+          </component>
+          <component id="sucMsg" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <font size="28" style="1"/>
+              <foreground color="-1"/>
+              <text value="Booking Confirmed!"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>
