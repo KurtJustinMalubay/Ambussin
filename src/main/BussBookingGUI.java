@@ -66,11 +66,7 @@ public class BussBookingGUI extends JFrame {
     private Seat currentSeat;
     private Booking currentBooking;
 
-    // =================================================================================
-    //  CONSTRUCTOR
-    // =================================================================================
     public BussBookingGUI() {
-        // 1. Frame Setup
         setTitle("AMBUSSIN Bus Booking System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -78,30 +74,17 @@ public class BussBookingGUI extends JFrame {
         setSize(screen);
         setLocationRelativeTo(null);
 
-        // 2. Initialize Data
         cleanupOldBookings();
         initializeDatabase();
 
-        // 3. Setup Components (Dropdowns, Table styles)
         setupComponentStyles();
 
-        // 4. Bind the Content Pane
         setContentPane(mainCardPanel);
 
-        // 5. Initialize All Event Listeners
-        initListeners();
+        listeners();
 
-        // 6. Show Frame
         setVisible(true);
     }
-
-    // =================================================================================
-    //  GUI DESIGNER: CUSTOM COMPONENT CREATION
-    // =================================================================================
-    /**
-     * Called automatically by IntelliJ before the constructor to create
-     * components marked as "Custom Create" in the .form file.
-     */
     private void createUIComponents() {
         // Buttons
         landingStartButton = new RoundedButton("BOOK A TICKET");
@@ -115,26 +98,19 @@ public class BussBookingGUI extends JFrame {
         seatMapPanel.setBackground(Color.WHITE);
     }
 
-    // =================================================================================
-    //  EVENT LISTENER MANAGEMENT
-    // =================================================================================
-    private void initListeners() {
+    private void listeners() {
         CardLayout cl = (CardLayout) mainCardPanel.getLayout();
 
-        // 1. Landing Page -> Search
         landingStartButton.addActionListener(e -> cl.show(mainCardPanel, PAGE_SEARCH));
 
-        // 2. Search Logic
         searchButton.addActionListener(e -> performSearch(cl));
 
-        // 3. Table Selection Logic (Populate Seat Map)
         scheduleTable.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && scheduleTable.getSelectedRow() != -1) {
                 handleTableSelection();
             }
         });
 
-        // 4. Proceed -> Summary
         proceedButton.addActionListener(e -> {
             if (validateSelection()) {
                 updateSummaryDetails();
@@ -142,26 +118,22 @@ public class BussBookingGUI extends JFrame {
             }
         });
 
-        // 5. Pay -> Success (Generate Ticket)
         payButton.addActionListener(e -> {
             confirmBookingAndShowTicket();
-            // Note: The ticket dialog closing will trigger the page switch to Success
         });
 
         // 6. Home -> Restart App
         homeButton.addActionListener(e -> {
-            this.dispose(); // Close current window
-            new BussBookingGUI(); // Start fresh
+            passengerNameField.setText("");
+            originDropdown.setSelectedItem("");
+            destinationDropdown.setSelectedItem("");
+            cl.show(mainCardPanel, PAGE_LANDING);
         });
 
         // 7. Auto-Complete Logic for Dropdowns
         addAutoComplete(originDropdown);
         addAutoComplete(destinationDropdown);
     }
-
-    // =================================================================================
-    //  LOGIC IMPLEMENTATION
-    // =================================================================================
 
     private void performSearch(CardLayout cl) {
         String inputOrigin = (String) originDropdown.getEditor().getItem();
@@ -181,7 +153,6 @@ public class BussBookingGUI extends JFrame {
             return;
         }
 
-        // Reset State
         currentRoute = null;
         currentSeat = null;
         currentBooking = null;
@@ -189,12 +160,11 @@ public class BussBookingGUI extends JFrame {
         seatMapPanel.repaint();
         totalFareLabel.setText("Select a schedule");
 
-        // Populate Table
         DefaultTableModel model = new DefaultTableModel(new String[]{"ID", "TIME", "BUS INFO", "PRICE"}, 0);
         for (Route r : foundRoutes) {
             model.addRow(new Object[]{
                     r.getRouteInfo().split("\\[")[1].split("]")[0],
-                    "08:00 AM", // Placeholder time
+                    "08:00 AM",
                     r.getVehicle(),
                     String.format("%.2f", r.getBaseFare())
             });
@@ -277,7 +247,7 @@ public class BussBookingGUI extends JFrame {
         currentSeat.setPassengerType(type);
         Booking tempBooking = new Booking(tempPass, currentRoute, currentSeat);
         totalFareLabel.setText("Total Fare: PHP " + String.format("%.2f", tempBooking.getTotalFare()));
-        currentSeat.release(); // Just a calculation, don't hold the seat yet
+        currentSeat.release();
     }
 
     private boolean validateSelection() {
@@ -342,12 +312,7 @@ public class BussBookingGUI extends JFrame {
         ticketDialog.setVisible(true);
     }
 
-    // =================================================================================
-    //  HELPERS & UTILITIES
-    // =================================================================================
-
     private void setupComponentStyles() {
-        // Data for dropdowns
         List<String> dates = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMM d");
         for (int i = 0; i < 7; i++) dates.add(LocalDate.now().plusDays(i).format(formatter));
@@ -388,7 +353,6 @@ public class BussBookingGUI extends JFrame {
             }
         });
     }
-
     private void styleSeatButton(JButton btn) {
         btn.setPreferredSize(new Dimension(45, 45));
         btn.setBackground(new Color(153, 255, 153));
@@ -414,6 +378,7 @@ public class BussBookingGUI extends JFrame {
         d.setVisible(true);
     }
 
+    //RANDOMIZE PATH NI FOR FARE
     private void initializeDatabase() {
         databaseRoutes.clear();
         for (int i = 0; i < CITY_DATA.length; i++) {
@@ -424,7 +389,7 @@ public class BussBookingGUI extends JFrame {
                 String routeID = "R" + (i + 1) + "-" + (j + 1);
                 double baseFare = 150.0 + (Math.abs(origin.hashCode() - dest.hashCode()) % 500);
 
-                Vehicle vehicle; // Basic simulation of vehicle assignment
+                Vehicle vehicle;
                 if ((i + j) % 3 == 0) vehicle = new Vehicle("BUS-" + routeID, "Deluxe Sleeper", 30);
                 else if ((i + j) % 2 == 0) vehicle = new Vehicle("BUS-" + routeID, "Aircon", 45);
                 else vehicle = new Vehicle("BUS-" + routeID, "Non-Aircon", 50);
@@ -453,9 +418,7 @@ public class BussBookingGUI extends JFrame {
         }
     }
 
-    // =================================================================================
-    //  INNER CLASS: CUSTOM BUTTON
-    // =================================================================================
+    //FROM JOEL CODE
     static class RoundedButton extends JButton {
         public RoundedButton(String label) {
             super(label);
@@ -483,9 +446,6 @@ public class BussBookingGUI extends JFrame {
         }
     }
 
-    // =================================================================================
-    //  MAIN ENTRY POINT
-    // =================================================================================
     public static void main(String[] args) {
         SwingUtilities.invokeLater(BussBookingGUI::new);
     }

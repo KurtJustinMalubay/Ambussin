@@ -84,19 +84,19 @@
               <size top="15" left="20" bottom="15" right="20"/>
             </border>
             <children>
-              <component id="brand1" class="javax.swing.JLabel">
-                <constraints border-constraint="West"/>
-                <properties>
-                  <font name="Segoe UI" size="20" style="1"/>
-                  <foreground color="-3425452"/>
-                  <text value="AMBUSSIN"/>
-                </properties>
-              </component>
               <component id="title1" class="javax.swing.JLabel">
                 <constraints border-constraint="East"/>
                 <properties>
                   <foreground color="-1"/>
                   <text value="Find Your Trip"/>
+                </properties>
+              </component>
+              <component id="brand1" class="javax.swing.JLabel">
+                <constraints border-constraint="Center"/>
+                <properties>
+                  <font name="Segoe UI" size="20" style="1"/>
+                  <foreground color="-3425452"/>
+                  <text value="AMBUSSIN"/>
                 </properties>
               </component>
             </children>
@@ -234,6 +234,14 @@
                   <text value="Select Schedule &amp; Seat"/>
                 </properties>
               </component>
+              <component id="4c672" class="javax.swing.JLabel">
+                <constraints border-constraint="West"/>
+                <properties>
+                  <font name="Segoe UI" size="20" style="1"/>
+                  <foreground color="-3425452"/>
+                  <text value="AMBUSSIN"/>
+                </properties>
+              </component>
             </children>
           </grid>
           <grid id="selContent" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="20" vgap="0">
@@ -247,7 +255,11 @@
               <grid id="leftP" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="0" left="0" bottom="0" right="0"/>
                 <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                    <minimum-size width="500" height="-1"/>
+                    <preferred-size width="500" height="-1"/>
+                    <maximum-size width="500" height="-1"/>
+                  </grid>
                 </constraints>
                 <properties/>
                 <border type="none"/>
@@ -277,7 +289,11 @@
               </grid>
               <grid id="rightP" layout-manager="BorderLayout" hgap="0" vgap="0">
                 <constraints>
-                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="2" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                    <minimum-size width="400" height="-1"/>
+                    <preferred-size width="400" height="-1"/>
+                    <maximum-size width="400" height="-1"/>
+                  </grid>
                 </constraints>
                 <properties>
                   <background color="-1"/>
@@ -335,7 +351,7 @@
         </properties>
         <border type="none"/>
         <children>
-          <grid id="receipt" layout-manager="GridLayoutManager" row-count="7" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="10">
+          <grid id="receipt" layout-manager="GridLayoutManager" row-count="8" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="10">
             <margin top="40" left="60" bottom="40" right="60"/>
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
@@ -348,7 +364,7 @@
             <children>
               <component id="sumName" class="javax.swing.JLabel" binding="summaryNameLabel">
                 <constraints>
-                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <font style="1"/>
@@ -356,19 +372,19 @@
               </component>
               <component id="sumRoute" class="javax.swing.JLabel" binding="summaryRouteLabel">
                 <constraints>
-                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties/>
               </component>
               <component id="sumSeat" class="javax.swing.JLabel" binding="summarySeatLabel">
                 <constraints>
-                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties/>
               </component>
               <component id="sumPrice" class="javax.swing.JLabel" binding="summaryPriceLabel">
                 <constraints>
-                  <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <font size="36" style="1"/>
@@ -377,10 +393,31 @@
               </component>
               <component id="payBtn" class="javax.swing.JButton" binding="payButton" custom-create="true">
                 <constraints>
-                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <text value="PAY &amp; CONFIRM"/>
+                </properties>
+              </component>
+              <component id="1b786" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <font name="Segoe UI" size="20" style="1"/>
+                  <foreground color="-10612443"/>
+                  <text value="AMBUSSIN"/>
+                </properties>
+              </component>
+              <component id="77e8f" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <enabled value="true"/>
+                  <font name="Segoe UI" size="15" style="0"/>
+                  <foreground color="-5723474"/>
+                  <text value="Trip Summary"/>
                 </properties>
               </component>
             </children>
