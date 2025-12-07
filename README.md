@@ -15,7 +15,7 @@
 
 ### Admin Module
 * **Secure Access:** Password-protected dashboard (Default: `admin123`).
-* **Fleet Management:** Add new bus units directly from the GUI (updates `buses.csv`).
+* **Bus Management:** Add new bus units directly from the GUI (updates `buses.csv`).
 * **Audit Logging:** View a tabular history of all transactions, including passenger names, types, and amounts paid.
 
 ---
@@ -51,9 +51,11 @@ Ambussin/
 ├── buses.csv                # Config file (Blueprint of the fleet)
 ├── transactions.csv         # Log file (Generated automatically)
 ├── src/
+│   ├── resources            # Assests/Images Used
 │   └── main/
 │       ├── Main.java        # Entry Point
 │       ├── exceptions/      # Custom Exceptions (AdminAccess, InvalidSeat, etc.)
-│       ├── manager/         # VehicleFactory, PassengerFactory, DataManager (Singleton)
+│       ├── managers/         # VehicleFactory, PassengerFactory, DataManager (Singleton)
 │       ├── gui/             # Swing UI Panels
+│       │   └── components   # Additional UI assets
 │       └── models/          # Bus, Passenger, Vehicle, etc.

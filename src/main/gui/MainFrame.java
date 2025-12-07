@@ -12,37 +12,36 @@ public class MainFrame extends JFrame {
     private JPanel mainPanel;
     private CardLayout cards;
 
-    // Wrapper Classes for Forms
     private LandingPanel landing;
     private BookingPanel booking;
     private SelectionPanel selection;
     private AdminPanel admin;
 
     public MainFrame() {
-        setTitle("Ambussin Kiosk");
-        setSize(1024, 768);
+        setTitle("Ambussin: Kiosk");
+        setUndecorated(true);
+        setSize(new Dimension(1024, 756));
+        setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         cards = new CardLayout();
         mainPanel = new JPanel(cards);
 
-        // Load Data safely
         List<Vehicle> data;
         try {
             data = DataManager.getInstance().loadVehicles();
+            DataManager.getInstance().loadBookings(data);
         } catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(this, "Error loading database: " + e.getMessage());
-            data = List.of(); // Empty list fallback
+            data = List.of();
         }
 
-        // Initialize Forms
         landing = new LandingPanel(this);
         booking = new BookingPanel(this, data);
         selection = new SelectionPanel(this, data);
-        admin = new AdminPanel(this);
+        admin = new AdminPanel(this, data);
 
-        // Add Panels via .getMainPanel() getter
         mainPanel.add(landing.getMainPanel(), "LANDING");
         mainPanel.add(booking.getMainPanel(), "BOOKING");
         mainPanel.add(selection.getMainPanel(), "SELECTION");
@@ -52,18 +51,22 @@ public class MainFrame extends JFrame {
         goToLanding();
     }
 
-    // Navigation Methods
     public void goToLanding() { cards.show(mainPanel, "LANDING"); }
-
     public void goToBooking() { cards.show(mainPanel, "BOOKING"); }
-
-    public void goToSelection(String dest, String busType, String pType) {
-        selection.loadResults(dest, busType, pType);
+    public void goToSelection(String dest, String busType, String pType, String date) {
+        selection.loadResults(dest, busType, pType, date);
         cards.show(mainPanel, "SELECTION");
     }
+    public void showAdmin() { admin.refreshLogs();cards.show(mainPanel, "ADMIN"); }
 
-    public void showAdmin() {
-        admin.refresh();
-        cards.show(mainPanel, "ADMIN");
+    public void refreshApp(){
+        try{
+            List<Vehicle> newData = DataManager.getInstance().loadVehicles();
+            DataManager.getInstance().loadBookings(newData);
+            booking.reloadData(newData);
+            selection.update(newData);
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
     }
 }

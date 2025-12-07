@@ -16,12 +16,23 @@ public abstract class Bus extends Vehicle {
         this.basePrice = basePrice;
         this.capacity = capacity;
 
-        int rows = (int) Math.ceil((double) capacity / cols);
+        int sFront = cols;
+        int sBack = cols - 1;
+
+        int remainingCap = capacity - sFront;
+        int backRows = (int) Math.ceil((double) remainingCap / sBack);
+        int rows = backRows + 1;
+
         this.seats = new boolean[rows][cols];
         for(int i = 0; i < rows; i++){
             for(int j = 0; j < cols; j++){
                 this.seats[i][j] = true;
             }
+        }
+
+        int middleSeats = cols / 2;
+        for(int i = 1; i < rows; i++){
+            this.seats[i][middleSeats] = false;
         }
     }
 
