@@ -1,5 +1,6 @@
 package main.gui;
 
+import main.exceptions.InvalidSeatException;
 import main.managers.DataManager;
 import main.managers.PassengerFactory;
 import main.models.Bus;
@@ -102,6 +103,9 @@ public class TicketPanel {
             JOptionPane.showMessageDialog(null, "Ticket Created Successfully!");
             controller.goToLanding();
 
+        } catch (InvalidSeatException e){
+            JOptionPane.showMessageDialog(mainPanel, "Booking Failed: " + e.getMessage(), "Seat Error", JOptionPane.ERROR_MESSAGE);
+            parentWindow.dispose();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(mainPanel, "Error: " + e.getMessage());
         }
