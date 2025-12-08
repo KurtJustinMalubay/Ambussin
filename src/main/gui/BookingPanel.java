@@ -5,6 +5,8 @@ import main.models.Vehicle;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -13,6 +15,7 @@ import java.util.Set;
 
 public class BookingPanel {
     private JPanel mainPanel;
+    private JTextField txtName;
     private JComboBox<String> cmbDate;
     private JComboBox<String> cmbDest;
     private JComboBox<String> cmbPassenger;
@@ -28,14 +31,16 @@ public class BookingPanel {
     private static final String DATE_PLACEHOLDER = "Select Date...";
     private static final String DEST_PLACEHOLDER = "Destination...";
     private static final String TYPE_PLACEHOLDER = "Type...";
+    private static final String NAME_PLACEHOLDER = "Passenger Name";
 
     public BookingPanel(MainFrame controller, List<Vehicle> vehicles) {
         this.controller = controller;
         this.allVehicles = vehicles;
 
+        setupTextFieldPlaceholder(txtName, NAME_PLACEHOLDER);
+
         setupDateSelector();
 
-        // Destinations
         setupAutoRemovePlaceholder(cmbDest, DEST_PLACEHOLDER);
         Set<String> dests = new HashSet<>();
         for (Vehicle v : vehicles) {
@@ -45,7 +50,6 @@ public class BookingPanel {
         }
         for (String d : dests) cmbDest.addItem(d);
 
-        // Passenger Types
         setupAutoRemovePlaceholder(cmbPassenger, TYPE_PLACEHOLDER);
         cmbPassenger.addItem("Regular");
         cmbPassenger.addItem("Student");
@@ -54,12 +58,34 @@ public class BookingPanel {
 
         stylePlaceholders();
 
-        // Radios
         ButtonGroup bg = new ButtonGroup();
         bg.add(rbAircon); bg.add(rbStandard);
         rbAircon.setSelected(true);
 
         btnSearch.addActionListener(e -> search());
+    }
+
+    private void setupTextFieldPlaceholder(JTextField field, String placeholder) {
+        field.setText(placeholder);
+        field.setForeground(Color.GRAY);
+
+        field.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (field.getText().equals(placeholder)) {
+                    field.setText("");
+                    field.setForeground(Color.BLACK);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (field.getText().isEmpty()) {
+                    field.setForeground(Color.GRAY);
+                    field.setText(placeholder);
+                }
+            }
+        });
     }
 
     private void setupAutoRemovePlaceholder(JComboBox<String> box, String placeholder) {
@@ -84,10 +110,15 @@ public class BookingPanel {
     }
 
     private void search(){
+        String name = txtName.getText().trim();
         String date = (String) cmbDate.getSelectedItem();
         String dest = (String) cmbDest.getSelectedItem();
         String pType = (String) cmbPassenger.getSelectedItem();
 
+        if (name.isEmpty() || name.equals(NAME_PLACEHOLDER)) {
+            JOptionPane.showMessageDialog(mainPanel, "Please enter Passenger Name.");
+            return;
+        }
         if (date == null || date.equals("Select Date...")) {
             JOptionPane.showMessageDialog(mainPanel, "Please select a Travel Date.");
             return;
@@ -107,7 +138,7 @@ public class BookingPanel {
         for(Vehicle v : allVehicles){
             if(v instanceof Bus b) {
                 if(b.getDestination().equalsIgnoreCase(dest) &&
-                    b.getVehicleType().toLowerCase().contains(busType.toLowerCase())){
+                        b.getVehicleType().toLowerCase().contains(busType.toLowerCase())){
                     busExists = true;
                     break;
                 }
@@ -155,11 +186,10 @@ public class BookingPanel {
     public JPanel getMainPanel() { return mainPanel; }
 
     private void createUIComponents() {
-        // TODO: place custom component creation code here
         btnSearch = new main.gui.components.RoundedButton("Search Schedules").setNormalColor(new Color(244, 208, 63))
                 .setHoverColor(new Color(255, 225, 100))
                 .setPressedColor(new Color(200, 170, 50));
         bodyPanel = new main.gui.components.ImagePanel("/Cool_bg.png");
-        bodyPanel.setLayout(new BorderLayout());
+        bodyPanel.setLayout(new GridBagLayout());
     }
 }
