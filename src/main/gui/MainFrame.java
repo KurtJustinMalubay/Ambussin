@@ -52,7 +52,10 @@ public class MainFrame extends JFrame {
     }
 
     public void goToLanding() { cards.show(mainPanel, "LANDING"); }
-    public void goToBooking() { cards.show(mainPanel, "BOOKING"); }
+    public void goToBooking() {
+        booking.resetForm();
+        cards.show(mainPanel, "BOOKING");
+    }
     public void goToSelection(String dest, String busType, String pType, String date, String name) {
         selection.loadResults(dest, busType, pType, date, name);
         cards.show(mainPanel, "SELECTION");

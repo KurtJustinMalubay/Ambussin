@@ -5,8 +5,8 @@ import main.models.Vehicle;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.FocusAdapter; // Import added
-import java.awt.event.FocusEvent;   // Import added
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -31,8 +31,6 @@ public class BookingPanel {
     private static final String DATE_PLACEHOLDER = "Select Date...";
     private static final String DEST_PLACEHOLDER = "Destination...";
     private static final String TYPE_PLACEHOLDER = "Type...";
-
-    // 1. CHANGED: Updated the text here
     private static final String NAME_PLACEHOLDER = "Passenger Name";
 
     public BookingPanel(MainFrame controller, List<Vehicle> vehicles) {
@@ -45,7 +43,6 @@ public class BookingPanel {
         // Destinations
         setupAutoRemovePlaceholder(cmbDest, DEST_PLACEHOLDER);
         Set<String> dests = new HashSet<>();
-
         for (Vehicle v : vehicles) {
             if (v instanceof Bus) {
                 dests.add(((Bus) v).getDestination());
@@ -62,12 +59,89 @@ public class BookingPanel {
 
         stylePlaceholders();
 
-        // Radios
+        // Setup Radio Button Group
         ButtonGroup bg = new ButtonGroup();
         bg.add(rbAircon); bg.add(rbStandard);
-        rbAircon.setSelected(true);
+
+        // Listener for Destination changes
+        cmbDest.addActionListener(e -> {
+            SwingUtilities.invokeLater(this::updateBusTypeAvailability);
+        });
 
         btnSearch.addActionListener(e -> search());
+
+        // --- APPLY DEFAULT STATE ON STARTUP ---
+        resetForm();
+    }
+
+    /**
+     * Resets all fields to their default "Placeholder" state.
+     */
+    public void resetForm() {
+        nameField.setText(NAME_PLACEHOLDER);
+        nameField.setForeground(Color.GRAY);
+
+        resetComboBox(cmbDate, DATE_PLACEHOLDER);
+        resetComboBox(cmbDest, DEST_PLACEHOLDER);
+        resetComboBox(cmbPassenger, TYPE_PLACEHOLDER);
+
+        rbAircon.setEnabled(false);
+        rbStandard.setEnabled(false);
+
+        ButtonGroup bg = ((DefaultButtonModel)rbAircon.getModel()).getGroup();
+        if(bg != null) bg.clearSelection();
+
+        if (mainPanel != null) mainPanel.repaint();
+    }
+
+    private void resetComboBox(JComboBox<String> box, String placeholder) {
+        boolean exists = false;
+        for (int i = 0; i < box.getItemCount(); i++) {
+            if (box.getItemAt(i).equals(placeholder)) {
+                exists = true;
+                break;
+            }
+        }
+        if (!exists) {
+            box.insertItemAt(placeholder, 0);
+        }
+        box.setSelectedItem(placeholder);
+    }
+
+    private void updateBusTypeAvailability() {
+        Object selectedObj = cmbDest.getSelectedItem();
+
+        if (selectedObj == null || selectedObj.toString().equals(DEST_PLACEHOLDER)) {
+            rbAircon.setEnabled(false);
+            rbStandard.setEnabled(false);
+            ButtonGroup bg = ((DefaultButtonModel)rbAircon.getModel()).getGroup();
+            if(bg != null) bg.clearSelection();
+            return;
+        }
+
+        String selectedDest = selectedObj.toString();
+        boolean hasAircon = false;
+        boolean hasStandard = false;
+
+        for (Vehicle v : allVehicles) {
+            if (v instanceof Bus) {
+                Bus b = (Bus) v;
+                if (b.getDestination().trim().equalsIgnoreCase(selectedDest.trim())) {
+                    String vType = b.getVehicleType().toLowerCase();
+                    if (vType.contains("aircon")) hasAircon = true;
+                    else if (vType.contains("standard")) hasStandard = true;
+                }
+            }
+        }
+
+        rbAircon.setEnabled(hasAircon);
+        rbStandard.setEnabled(hasStandard);
+
+        if (hasAircon && !hasStandard) rbAircon.setSelected(true);
+        else if (!hasAircon && hasStandard) rbStandard.setSelected(true);
+        else if (hasAircon && hasStandard) {
+            if (!rbAircon.isSelected() && !rbStandard.isSelected()) rbAircon.setSelected(true);
+        }
     }
 
     private void setupNameField() {
@@ -82,7 +156,6 @@ public class BookingPanel {
                     nameField.setForeground(Color.BLACK);
                 }
             }
-
             @Override
             public void focusLost(FocusEvent e) {
                 if (nameField.getText().trim().isEmpty()) {
@@ -95,7 +168,6 @@ public class BookingPanel {
 
     private void setupAutoRemovePlaceholder(JComboBox<String> box, String placeholder) {
         box.addItem(placeholder);
-
         box.addActionListener(e -> {
             Object selected = box.getSelectedItem();
             if (selected != null && !selected.equals(placeholder)) {
@@ -118,9 +190,12 @@ public class BookingPanel {
         String date = (String) cmbDate.getSelectedItem();
         String dest = (String) cmbDest.getSelectedItem();
         String pType = (String) cmbPassenger.getSelectedItem();
-
         String pName = nameField.getText();
 
+        if (pName == null || pName.trim().isEmpty() || pName.equals(NAME_PLACEHOLDER)) {
+            JOptionPane.showMessageDialog(mainPanel, "Please enter the Passenger Name.");
+            return;
+        }
         if (date == null || date.equals(DATE_PLACEHOLDER)) {
             JOptionPane.showMessageDialog(mainPanel, "Please select a Travel Date.");
             return;
@@ -133,8 +208,9 @@ public class BookingPanel {
             JOptionPane.showMessageDialog(mainPanel, "Please select a Passenger Type.");
             return;
         }
-        if (pName == null || pName.trim().isEmpty() || pName.equals(NAME_PLACEHOLDER)) {
-            JOptionPane.showMessageDialog(mainPanel, "Please enter the Passenger Name.");
+
+        if (!rbAircon.isSelected() && !rbStandard.isSelected()) {
+            JOptionPane.showMessageDialog(mainPanel, "Please select a Bus Type (Aircon/Standard).");
             return;
         }
 
@@ -180,19 +256,19 @@ public class BookingPanel {
 
     public void reloadData(List<Vehicle> vehicles) {
         cmbDest.removeAllItems();
-        setupAutoRemovePlaceholder(cmbDest, DEST_PLACEHOLDER);
         Set<String> dests = new HashSet<>();
         for (Vehicle v : vehicles) {
             if (v instanceof Bus) { dests.add(((Bus) v).getDestination()); }
         }
         for(String d : dests) cmbDest.addItem(d);
-        stylePlaceholders();
+
+        resetForm();
     }
 
     public JPanel getMainPanel() { return mainPanel; }
 
     private void createUIComponents() {
-        txtName = new JTextField();
+        JTextField txtName = new JTextField();
         txtName.setPreferredSize(new Dimension(250, 25));
         txtName.setFont(new Font("Arial", Font.PLAIN, 14));
 
@@ -200,7 +276,6 @@ public class BookingPanel {
                 .setNormalColor(new Color(244, 208, 63))
                 .setHoverColor(new Color(255, 225, 100))
                 .setPressedColor(new Color(200, 170, 50));
-
 
         bodyPanel = new main.gui.components.ImagePanel("/Cool_bg.png");
         bodyPanel.setLayout(new BorderLayout());

@@ -93,6 +93,7 @@ public class LandingPanel {
             btnBook.addActionListener(e -> {
                 stopTimers();
                 parent.goToBooking();
+
             });
         }
     }

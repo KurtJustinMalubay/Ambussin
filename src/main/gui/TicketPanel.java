@@ -103,7 +103,7 @@ public class TicketPanel {
             DataManager.getInstance().saveTransaction(
                     vehicle.getVehicleID(),
                     (row + 1) + "-" + (col + 1),
-                    passengerName, // 4. Using the actual name variable here
+                    passengerName,
                     pType,
                     finalPrice,
                     date
@@ -112,7 +112,6 @@ public class TicketPanel {
             parentWindow.dispose();
             JOptionPane.showMessageDialog(null, "Ticket Created Successfully!");
             controller.goToLanding();
-
         } catch (InvalidSeatException e){
             JOptionPane.showMessageDialog(mainPanel, "Booking Failed: " + e.getMessage(), "Seat Error", JOptionPane.ERROR_MESSAGE);
             parentWindow.dispose();
