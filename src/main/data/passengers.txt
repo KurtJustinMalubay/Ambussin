@@ -1,0 +1,4 @@
+Alice,25,Student
+Bob,60,Senior
+Alice,25,Student
+Bob,60,Senior
