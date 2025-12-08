@@ -29,6 +29,14 @@ public class SelectionPanel {
     private String passengerType;
     private String selectedDate;
 
+    // Add these to your class fields
+    private RoundedButton currentSelectedBtn = null; // Track the specific button instance
+    private final Color COLOR_OPEN = new Color(102, 204, 102);
+    private final Color COLOR_TAKEN = new Color(211, 93, 93);
+    private final Color COLOR_DRIVER = new Color(90, 200, 250);
+    private final Color COLOR_SELECTED = new Color(74, 143, 74); // Darker Green
+    private final Color COLOR_AISLE = new Color(224, 224, 224); // Or transparent
+
     public SelectionPanel(MainFrame controller, List<Vehicle> vehicles) {
         this.controller = controller;
         this.allVehicles = vehicles;
@@ -120,47 +128,48 @@ public class SelectionPanel {
     private void loadSeats(Bus b) {
         this.selectedBus = b;
         this.sRow = -1;
+        this.sCol = -1;
+        this.currentSelectedBtn = null;
         btnConfirm.setEnabled(false);
 
         seatContainer.removeAll();
+        // Use the bus dimensions
         seatContainer.setLayout(new GridLayout(b.getRows(), b.getCols(), 5, 5));
 
         for (int r = 0; r < b.getRows(); r++) {
             for (int c = 0; c < b.getCols(); c++) {
-                RoundedButton btn = new RoundedButton("");
-                btn.setRadius(0);
-                btn.setPreferredSize(new Dimension(45, 45));
-                int middleCol = b.getCols() / 2;
-                boolean isLastRow = (r == b.getRows() - 1);
 
-                if (c == middleCol && r > 0 && !isLastRow) {
-                    btn.setOpaque(false);
-                    btn.setContentAreaFilled(false);
-                    btn.setBorderPainted(false);
+                boolean isDriver = (r == 0 && c == 0);
+                int middleCol = b.getCols() / 2;
+                boolean isAisle = (c == middleCol && r != b.getRows() - 1);
+
+                RoundedButton btn = new RoundedButton("");
+                btn.setRadius(10);
+                btn.setPreferredSize(new Dimension(45, 45));
+                btn.setMargin(new Insets(0, 0, 0, 0));
+
+                if (isDriver) {
+                    btn.setNormalColor(new Color(90, 200, 250)); // Driver Blue
                     btn.setEnabled(false);
                 }
-                else if (isLastRow && c == 4) {
-                    btn.setNormalColor(new Color(90, 200, 250));
-                    btn.setEnabled(false);
-                    // Optional: btn.setIcon(driverIcon);
-                }
-                else if (isLastRow && c < 4) {
+                else if (isAisle) {
                     btn.setOpaque(false);
                     btn.setContentAreaFilled(false);
                     btn.setBorderPainted(false);
                     btn.setEnabled(false);
                 }
                 else if (!b.isSeatAvailable(r, c)) {
-                    btn.setNormalColor(new Color(211, 93, 93));
+                    btn.setNormalColor(new Color(211, 93, 93)); // Taken Red
                     btn.setEnabled(false);
                 }
                 else {
-                    btn.setNormalColor(new Color(102, 204, 102));
-                    btn.setHoverColor(new Color(74, 143, 74));
-                    int fr = r, fc = c;
-                    btn.addActionListener(e -> selectSeat(btn, fr, fc));
-                }
+                    btn.setNormalColor(new Color(102, 204, 102)); // Open Green
+                    btn.setHoverColor(new Color(74, 143, 74));    // Darker Green on Hover
 
+                    int finalR = r;
+                    int finalC = c;
+                    btn.addActionListener(e -> selectSeat(btn, finalR, finalC));
+                }
                 seatContainer.add(btn);
             }
         }
@@ -168,17 +177,18 @@ public class SelectionPanel {
         seatContainer.repaint();
     }
 
-    private void selectSeat(RoundedButton b, int r, int c) {
-        Color origColor = new Color(102, 204, 102);
-        Color selectedColor = new Color(74, 143, 74);
-        for (Component cp : seatContainer.getComponents()) {
-            if (cp instanceof RoundedButton){
-                RoundedButton rb = (RoundedButton) cp;
-                if(rb.getBackground().equals(selectedColor)) rb.setNormalColor(origColor);
-            }
+    private void selectSeat(RoundedButton btn, int r, int c) {
+        if (currentSelectedBtn != null) {
+            currentSelectedBtn.setNormalColor(COLOR_OPEN);
+            currentSelectedBtn.repaint();
         }
-        b.setNormalColor(new Color(74, 143, 74));
-        sRow = r; sCol = c;
+
+        btn.setNormalColor(COLOR_SELECTED);
+
+        currentSelectedBtn = btn;
+        sRow = r;
+        sCol = c;
+
         btnConfirm.setEnabled(true);
     }
 
