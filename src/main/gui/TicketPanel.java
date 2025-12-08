@@ -70,7 +70,7 @@ public class TicketPanel {
         addDetailRow(detailsPanel, gbc, 2, "BusType:", vehicle.getVehicleType());
         addDetailRow(detailsPanel, gbc, 3, "PassengerType:", pType);
         addDetailRow(detailsPanel, gbc, 4, "Destination:", ((Bus)vehicle).getDestination());
-        addDetailRow(detailsPanel, gbc, 5, "Seat:", (row+1) + "-" + (col+1));
+        addDetailRow(detailsPanel, gbc, 5, "Seat:", (row) + "-" + (col));
         addDetailRow(detailsPanel, gbc, 6, "Price:", String.format("%.2f", finalPrice));
     }
 

@@ -157,7 +157,7 @@ public class SelectionPanel {
 
 
         int passengerSeatsCounted = 0;
-        int maxSeats = 37;
+        int maxSeats = 41;
 
         for (int r = 0; r < b.getRows(); r++) {
             for (int c = 0; c < b.getCols(); c++) {
