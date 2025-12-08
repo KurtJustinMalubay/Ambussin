@@ -16,23 +16,25 @@ public abstract class Bus extends Vehicle {
         this.basePrice = basePrice;
         this.capacity = capacity;
 
-        int sFront = cols;
-        int sBack = cols - 1;
-
-        int remainingCap = capacity - sFront;
-        int backRows = (int) Math.ceil((double) remainingCap / sBack);
+        int seatsPerBackRow = cols - 1;
+        int backRows = (int) Math.ceil((double) (capacity - cols) / seatsPerBackRow) + 1;
         int rows = backRows + 1;
 
         this.seats = new boolean[rows][cols];
+
         for(int i = 0; i < rows; i++){
             for(int j = 0; j < cols; j++){
                 this.seats[i][j] = true;
             }
         }
 
-        int middleSeats = cols / 2;
-        for(int i = 1; i < rows; i++){
-            this.seats[i][middleSeats] = false;
+        for(int j = 0; j < cols; j++){
+            this.seats[0][j] = false;
+        }
+
+        int middleCol = cols / 2;
+        for(int i = 1; i < rows - 1; i++){
+            this.seats[i][middleCol] = false;
         }
     }
 
@@ -51,5 +53,4 @@ public abstract class Bus extends Vehicle {
         seats[r][c] = false;
     }
     public String getVehicleType(){return "Bus";}
-
 }
