@@ -5,6 +5,8 @@ import main.models.Vehicle;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.FocusAdapter; // Import added
+import java.awt.event.FocusEvent;   // Import added
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -21,6 +23,7 @@ public class BookingPanel {
     private JRadioButton rbStandard;
     private JButton btnSearch;
     private JPanel bodyPanel;
+    private JTextField nameField;
     private MainFrame controller;
 
     private List<Vehicle> allVehicles;
@@ -29,15 +32,20 @@ public class BookingPanel {
     private static final String DEST_PLACEHOLDER = "Destination...";
     private static final String TYPE_PLACEHOLDER = "Type...";
 
+    // 1. CHANGED: Updated the text here
+    private static final String NAME_PLACEHOLDER = "Passenger Name";
+
     public BookingPanel(MainFrame controller, List<Vehicle> vehicles) {
         this.controller = controller;
         this.allVehicles = vehicles;
 
         setupDateSelector();
+        setupNameField();
 
         // Destinations
         setupAutoRemovePlaceholder(cmbDest, DEST_PLACEHOLDER);
         Set<String> dests = new HashSet<>();
+
         for (Vehicle v : vehicles) {
             if (v instanceof Bus) {
                 dests.add(((Bus) v).getDestination());
@@ -60,6 +68,29 @@ public class BookingPanel {
         rbAircon.setSelected(true);
 
         btnSearch.addActionListener(e -> search());
+    }
+
+    private void setupNameField() {
+        nameField.setText(NAME_PLACEHOLDER);
+        nameField.setForeground(Color.GRAY);
+
+        nameField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (nameField.getText().equals(NAME_PLACEHOLDER)) {
+                    nameField.setText("");
+                    nameField.setForeground(Color.BLACK);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (nameField.getText().trim().isEmpty()) {
+                    nameField.setText(NAME_PLACEHOLDER);
+                    nameField.setForeground(Color.GRAY);
+                }
+            }
+        });
     }
 
     private void setupAutoRemovePlaceholder(JComboBox<String> box, String placeholder) {
@@ -88,16 +119,22 @@ public class BookingPanel {
         String dest = (String) cmbDest.getSelectedItem();
         String pType = (String) cmbPassenger.getSelectedItem();
 
-        if (date == null || date.equals("Select Date...")) {
+        String pName = nameField.getText();
+
+        if (date == null || date.equals(DATE_PLACEHOLDER)) {
             JOptionPane.showMessageDialog(mainPanel, "Please select a Travel Date.");
             return;
         }
-        if (dest == null || dest.equals("Destination...")) {
+        if (dest == null || dest.equals(DEST_PLACEHOLDER)) {
             JOptionPane.showMessageDialog(mainPanel, "Please select a Destination.");
             return;
         }
-        if (pType == null || pType.equals("Type...")) {
+        if (pType == null || pType.equals(TYPE_PLACEHOLDER)) {
             JOptionPane.showMessageDialog(mainPanel, "Please select a Passenger Type.");
+            return;
+        }
+        if (pName == null || pName.trim().isEmpty() || pName.equals(NAME_PLACEHOLDER)) {
+            JOptionPane.showMessageDialog(mainPanel, "Please enter the Passenger Name.");
             return;
         }
 
@@ -107,7 +144,7 @@ public class BookingPanel {
         for(Vehicle v : allVehicles){
             if(v instanceof Bus b) {
                 if(b.getDestination().equalsIgnoreCase(dest) &&
-                    b.getVehicleType().toLowerCase().contains(busType.toLowerCase())){
+                        b.getVehicleType().toLowerCase().contains(busType.toLowerCase())){
                     busExists = true;
                     break;
                 }
@@ -115,10 +152,11 @@ public class BookingPanel {
         }
         if(!busExists){
             JOptionPane.showMessageDialog(mainPanel,
-                    "No " + busType + " buses available for " + dest + ".", "Route Unvailable", JOptionPane.WARNING_MESSAGE);
+                    "No " + busType + " buses available for " + dest + ".", "Route Unavailable", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        controller.goToSelection(dest, busType, pType, date);
+
+        controller.goToSelection(dest, busType, pType, date, pName);
     }
 
     private void stylePlaceholders() {
@@ -126,9 +164,9 @@ public class BookingPanel {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if ("Select Destination...".equals(value) ||
-                        "Select Type...".equals(value) ||
-                        "Select Date...".equals(value)) {
+                if (DEST_PLACEHOLDER.equals(value) ||
+                        TYPE_PLACEHOLDER.equals(value) ||
+                        DATE_PLACEHOLDER.equals(value)) {
                     setForeground(Color.GRAY);
                 } else {
                     setForeground(Color.BLACK);
@@ -155,7 +193,6 @@ public class BookingPanel {
     public JPanel getMainPanel() { return mainPanel; }
 
     private void createUIComponents() {
-        // TODO: place custom component creation code here
         btnSearch = new main.gui.components.RoundedButton("Search Schedules").setNormalColor(new Color(244, 208, 63))
                 .setHoverColor(new Color(255, 225, 100))
                 .setPressedColor(new Color(200, 170, 50));

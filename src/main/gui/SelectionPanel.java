@@ -29,13 +29,16 @@ public class SelectionPanel {
     private String passengerType;
     private String selectedDate;
 
-    // Add these to your class fields
-    private RoundedButton currentSelectedBtn = null; // Track the specific button instance
+    // 1. ADDED: Field to store the name
+    private String passengerName;
+
+    // Constants for colors
+    private RoundedButton currentSelectedBtn = null;
     private final Color COLOR_OPEN = new Color(102, 204, 102);
     private final Color COLOR_TAKEN = new Color(211, 93, 93);
     private final Color COLOR_DRIVER = new Color(90, 200, 250);
-    private final Color COLOR_SELECTED = new Color(74, 143, 74); // Darker Green
-    private final Color COLOR_AISLE = new Color(224, 224, 224); // Or transparent
+    private final Color COLOR_SELECTED = new Color(74, 143, 74);
+    private final Color COLOR_AISLE = new Color(224, 224, 224);
 
     public SelectionPanel(MainFrame controller, List<Vehicle> vehicles) {
         this.controller = controller;
@@ -52,9 +55,10 @@ public class SelectionPanel {
 
         btnConfirm.addActionListener(e -> {
             if (selectedBus != null && sRow != -1) {
+                // 3. FIXED: Use the class field 'passengerName' here
                 TicketDialog dialog = new TicketDialog(
                         (JFrame) SwingUtilities.getWindowAncestor(mainPanel),
-                        controller, selectedBus, sRow, sCol, passengerType, selectedDate
+                        controller, selectedBus, sRow, sCol, passengerType, selectedDate, passengerName
                 );
                 dialog.setVisible(true);
             }
@@ -88,9 +92,9 @@ public class SelectionPanel {
         }
 
         legendPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 10));
-        legendPanel.add(createLegendItem(new Color(102, 204, 102), "Open"));
-        legendPanel.add(createLegendItem(new Color(211, 93, 93), "Taken"));
-        legendPanel.add(createLegendItem(new Color(90, 200, 250), "Driver"));
+        legendPanel.add(createLegendItem(COLOR_OPEN, "Open"));
+        legendPanel.add(createLegendItem(COLOR_TAKEN, "Taken"));
+        legendPanel.add(createLegendItem(COLOR_DRIVER, "Driver"));
     }
 
     private JPanel createLegendItem(Color c, String text) {
@@ -105,9 +109,11 @@ public class SelectionPanel {
         return p;
     }
 
-    public void loadResults(String dest, String busType, String pType, String date) {
+    public void loadResults(String dest, String busType, String pType, String date, String name) {
         this.passengerType = pType;
         this.selectedDate = date;
+        // 2. FIXED: Store the incoming name into the class field
+        this.passengerName = name;
 
         List<Vehicle> filtered = allVehicles.stream()
                 .filter(v -> v instanceof Bus &&
@@ -133,7 +139,6 @@ public class SelectionPanel {
         btnConfirm.setEnabled(false);
 
         seatContainer.removeAll();
-        // Use the bus dimensions
         seatContainer.setLayout(new GridLayout(b.getRows(), b.getCols(), 5, 5));
 
         for (int r = 0; r < b.getRows(); r++) {
@@ -149,7 +154,7 @@ public class SelectionPanel {
                 btn.setMargin(new Insets(0, 0, 0, 0));
 
                 if (isDriver) {
-                    btn.setNormalColor(new Color(90, 200, 250)); // Driver Blue
+                    btn.setNormalColor(COLOR_DRIVER);
                     btn.setEnabled(false);
                 }
                 else if (isAisle) {
@@ -159,12 +164,12 @@ public class SelectionPanel {
                     btn.setEnabled(false);
                 }
                 else if (!b.isSeatAvailable(r, c)) {
-                    btn.setNormalColor(new Color(211, 93, 93)); // Taken Red
+                    btn.setNormalColor(COLOR_TAKEN);
                     btn.setEnabled(false);
                 }
                 else {
-                    btn.setNormalColor(new Color(102, 204, 102)); // Open Green
-                    btn.setHoverColor(new Color(74, 143, 74));    // Darker Green on Hover
+                    btn.setNormalColor(COLOR_OPEN);
+                    btn.setHoverColor(COLOR_SELECTED);
 
                     int finalR = r;
                     int finalC = c;
@@ -197,7 +202,6 @@ public class SelectionPanel {
     public JPanel getMainPanel() { return mainPanel; }
 
     private void createUIComponents() {
-        // TODO: place custom component creation code here
         seatContainer = new main.gui.components.RoundedPanel(40, new Color(84, 120, 125));
 
         btnConfirm = new main.gui.components.RoundedButton("Confirm")

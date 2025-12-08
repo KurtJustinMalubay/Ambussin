@@ -26,7 +26,11 @@ public class TicketPanel {
     private double finalPrice;
     private String date;
 
-    public TicketPanel(Window parentWindow, MainFrame controller, Bus v, int r, int c, String pType, String date) {
+    // 1. New field for Name
+    private String passengerName;
+
+    // 2. Updated Constructor to accept 'name'
+    public TicketPanel(Window parentWindow, MainFrame controller, Bus v, int r, int c, String pType, String date, String name) {
         this.parentWindow = parentWindow;
         this.controller = controller;
         this.vehicle = v;
@@ -34,6 +38,7 @@ public class TicketPanel {
         this.col = c;
         this.pType = pType;
         this.date = date;
+        this.passengerName = name; // Store it
 
         initStyling();
         displayData();
@@ -56,8 +61,10 @@ public class TicketPanel {
         }
         lblQr.setHorizontalAlignment(SwingConstants.CENTER);
     }
+
     private void displayData() {
-        Passenger p = PassengerFactory.createPassenger(pType, "Kiosk", 0);
+        // Use the actual name for the factory (optional, but good practice)
+        Passenger p = PassengerFactory.createPassenger(pType, passengerName, 0);
         this.finalPrice = p.computeFare(vehicle.getBasePrice());
 
         detailsPanel.setLayout(new GridBagLayout());
@@ -65,13 +72,15 @@ public class TicketPanel {
         gbc.insets = new Insets(5, 0, 5, 0);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        addDetailRow(detailsPanel, gbc, 0, "BusID:", vehicle.getVehicleID());
+        // 3. Added "Name" to the display and adjusted row numbers (0 to 7)
+        addDetailRow(detailsPanel, gbc, 0, "Name:", passengerName);
         addDetailRow(detailsPanel, gbc, 1, "Date:", date);
-        addDetailRow(detailsPanel, gbc, 2, "BusType:", vehicle.getVehicleType());
-        addDetailRow(detailsPanel, gbc, 3, "PassengerType:", pType);
-        addDetailRow(detailsPanel, gbc, 4, "Destination:", ((Bus)vehicle).getDestination());
-        addDetailRow(detailsPanel, gbc, 5, "Seat:", (row+1) + "-" + (col+1));
-        addDetailRow(detailsPanel, gbc, 6, "Price:", String.format("%.2f", finalPrice));
+        addDetailRow(detailsPanel, gbc, 2, "BusID:", vehicle.getVehicleID());
+        addDetailRow(detailsPanel, gbc, 3, "BusType:", vehicle.getVehicleType());
+        addDetailRow(detailsPanel, gbc, 4, "PassengerType:", pType);
+        addDetailRow(detailsPanel, gbc, 5, "Destination:", ((Bus)vehicle).getDestination());
+        addDetailRow(detailsPanel, gbc, 6, "Seat:", (row+1) + "-" + (col+1));
+        addDetailRow(detailsPanel, gbc, 7, "Price:", String.format("%.2f", finalPrice));
     }
 
     private void addDetailRow(JPanel p, GridBagConstraints gbc, int row, String label, String value) {
@@ -86,6 +95,7 @@ public class TicketPanel {
         gbc.gridx = 1; gbc.gridy = row; gbc.weightx = 1.0; gbc.anchor = GridBagConstraints.EAST;
         p.add(lblVal, gbc);
     }
+
     private void confirmBooking() {
         try {
             vehicle.bookSeat(row, col);
@@ -93,7 +103,7 @@ public class TicketPanel {
             DataManager.getInstance().saveTransaction(
                     vehicle.getVehicleID(),
                     (row + 1) + "-" + (col + 1),
-                    "Kiosk", // placeholder name
+                    passengerName, // 4. Using the actual name variable here
                     pType,
                     finalPrice,
                     date
@@ -112,7 +122,6 @@ public class TicketPanel {
     }
 
     private void createUIComponents() {
-        // TODO: place custom component creation code here
         btnConfirm = new main.gui.components.RoundedButton("Confirm")
                 .setNormalColor(new Color(244, 208, 63))
                 .setHoverColor(new Color(255, 225, 100))

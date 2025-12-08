@@ -1,7 +1,7 @@
 package main.models;
 
 public abstract class Vehicle {
-    private String vehicleID;
+    private final String vehicleID;
 
     public Vehicle(String vehicleID) {
         this.vehicleID = vehicleID;

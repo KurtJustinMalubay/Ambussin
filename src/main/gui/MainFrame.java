@@ -53,8 +53,8 @@ public class MainFrame extends JFrame {
 
     public void goToLanding() { cards.show(mainPanel, "LANDING"); }
     public void goToBooking() { cards.show(mainPanel, "BOOKING"); }
-    public void goToSelection(String dest, String busType, String pType, String date) {
-        selection.loadResults(dest, busType, pType, date);
+    public void goToSelection(String dest, String busType, String pType, String date, String name) {
+        selection.loadResults(dest, busType, pType, date, name);
         cards.show(mainPanel, "SELECTION");
     }
     public void showAdmin() { admin.refreshLogs();cards.show(mainPanel, "ADMIN"); }
