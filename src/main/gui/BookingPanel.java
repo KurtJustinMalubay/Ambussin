@@ -192,9 +192,16 @@ public class BookingPanel {
     public JPanel getMainPanel() { return mainPanel; }
 
     private void createUIComponents() {
-        btnSearch = new main.gui.components.RoundedButton("Search Schedules").setNormalColor(new Color(244, 208, 63))
+        txtName = new JTextField();
+        txtName.setPreferredSize(new Dimension(250, 25));
+        txtName.setFont(new Font("Arial", Font.PLAIN, 14));
+
+        btnSearch = new main.gui.components.RoundedButton("Search Schedules")
+                .setNormalColor(new Color(244, 208, 63))
                 .setHoverColor(new Color(255, 225, 100))
                 .setPressedColor(new Color(200, 170, 50));
+
+
         bodyPanel = new main.gui.components.ImagePanel("/Cool_bg.png");
         bodyPanel.setLayout(new BorderLayout());
     }

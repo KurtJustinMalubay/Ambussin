@@ -51,4 +51,5 @@ public abstract class Bus extends Vehicle {
         seats[r][c] = false;
     }
     public String getVehicleType(){return "Bus";}
+    
 }
