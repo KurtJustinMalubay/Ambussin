@@ -20,6 +20,7 @@ public class SelectionPanel {
     private JPanel legendPanel;
     private JButton btnConfirm;
     private JPanel busWrapper;
+    private JLabel lblBusId;
     private MainFrame controller;
 
     private List<Vehicle> allVehicles;
@@ -34,6 +35,7 @@ public class SelectionPanel {
     private final Color COLOR_TAKEN = new Color(211, 93, 93);
     private final Color COLOR_SELECTED = new Color(74, 143, 74);
     private final Color COLOR_DRIVER = new Color(90, 200, 250);
+    private final Color COLOR_BUS_BG = new Color(68, 96, 100);
 
     public SelectionPanel(MainFrame controller, List<Vehicle> vehicles) {
         this.controller = controller;
@@ -66,11 +68,15 @@ public class SelectionPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.weightx = 1;
-        gbc.weighty = 1;
-        gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(0, 0, 10, 0);
 
+        lblBusId = new JLabel("");
+        lblBusId.setFont(new Font("Arial", Font.BOLD, 16));
+        lblBusId.setForeground(Color.BLACK);
+        busWrapper.add(lblBusId, gbc);
+
+        gbc.gridy = 1;
         busWrapper.remove(seatContainer);
         busWrapper.add(seatContainer, gbc);
 
@@ -97,12 +103,12 @@ public class SelectionPanel {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         p.setOpaque(false);
         JPanel box = new JPanel();
-        box.setPreferredSize(new Dimension(20, 20));
+        box.setPreferredSize(new Dimension(15, 15));
         box.setBackground(c);
         box.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         p.add(box);
         JLabel lbl = new JLabel(text);
-        lbl.setFont(new Font("Arial", Font.PLAIN, 14));
+        lbl.setFont(new Font("Arial", Font.PLAIN, 12));
         p.add(lbl);
         return p;
     }
@@ -123,6 +129,7 @@ public class SelectionPanel {
 
         seatContainer.removeAll();
         seatContainer.repaint();
+        lblBusId.setText("");
         btnConfirm.setEnabled(false);
 
         if (!model.isEmpty()) {
@@ -137,9 +144,16 @@ public class SelectionPanel {
         this.currentSelectedBtn = null;
         btnConfirm.setEnabled(false);
 
+        lblBusId.setText(b.getVehicleID());
+
         seatContainer.removeAll();
-        seatContainer.setBorder(new EmptyBorder(20, 20, 20, 20));
-        seatContainer.setLayout(new GridLayout(b.getRows(), b.getCols(), 15, 15));
+        seatContainer.setBackground(COLOR_BUS_BG);
+        if (seatContainer instanceof main.gui.components.RoundedPanel) {
+            ((main.gui.components.RoundedPanel) seatContainer).setBackground(COLOR_BUS_BG);
+        }
+
+        seatContainer.setBorder(new EmptyBorder(15, 15, 15, 15));
+        seatContainer.setLayout(new GridLayout(b.getRows(), b.getCols(), 5, 5));
 
         for (int r = 0; r < b.getRows(); r++) {
             for (int c = 0; c < b.getCols(); c++) {
@@ -149,16 +163,18 @@ public class SelectionPanel {
                 boolean isAisle = (c == middleCol && r != b.getRows() - 1);
 
                 RoundedButton btn = new RoundedButton("");
-                btn.setRadius(20);
-                btn.setPreferredSize(new Dimension(75, 75));
+                btn.setRadius(8);
+                btn.setPreferredSize(new Dimension(35, 35));
                 btn.setMargin(new Insets(0, 0, 0, 0));
+                btn.setBorderPainted(true);
+                btn.setBorderColor(new Color(0,0,0,50));
 
                 if (isDriver) {
                     btn.setNormalColor(COLOR_DRIVER);
                     btn.setEnabled(false);
-                    btn.setText("D");
-                    btn.setForeground(Color.WHITE);
-                    btn.setFont(new Font("Arial", Font.BOLD, 16));
+                    btn.setText("\u2388");
+                    btn.setForeground(Color.BLACK);
+                    btn.setFont(new Font("Segoe UI Symbol", Font.BOLD, 18));
                 }
                 else if (isAisle) {
                     btn.setOpaque(false);
@@ -207,15 +223,15 @@ public class SelectionPanel {
     public JPanel getMainPanel() { return mainPanel; }
 
     private void createUIComponents() {
-        seatContainer = new main.gui.components.RoundedPanel(40, new Color(84, 120, 125));
+        seatContainer = new main.gui.components.RoundedPanel(30, COLOR_BUS_BG);
 
         btnConfirm = new main.gui.components.RoundedButton("Confirm")
                 .setNormalColor(new Color(244, 208, 63))
                 .setHoverColor(new Color(255, 225, 100))
                 .setPressedColor(new Color(200, 170, 50));
 
-        btnConfirm.setPreferredSize(new Dimension(300, 50));
-        btnConfirm.setFont(new Font("Arial", Font.BOLD, 18));
+        btnConfirm.setPreferredSize(new Dimension(200, 40));
+        btnConfirm.setFont(new Font("Arial", Font.BOLD, 16));
 
         bodyPanel = new main.gui.components.ImagePanel("/Cool_bg.png");
         bodyPanel.setLayout(new BorderLayout());
