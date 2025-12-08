@@ -20,7 +20,11 @@ public class MainFrame extends JFrame {
     public MainFrame() {
         setTitle("Ambussin: Kiosk");
         setUndecorated(true);
-        setSize(new Dimension(1024, 756));
+
+        /*TEST*/
+        Dimension screen = getToolkit().getScreenSize();
+        Dimension preferred = new Dimension(1024, 756);
+        setSize(screen);
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
