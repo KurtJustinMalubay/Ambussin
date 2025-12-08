@@ -1,7 +1,11 @@
 package main.gui;
 
+import main.exceptions.AdminAccessException;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -10,15 +14,18 @@ public class LandingPanel {
     private JPanel bgPanel;
     private JButton btnBook;
 
-    private List<Image> image = new ArrayList<>();
+    private final List<Image> image = new ArrayList<>();
     private int currentIndex = 0;
     private int nextIndex = 1;
     private float slideOffset = 0;
     private boolean isAnimating = false;
-    private MainFrame parent;
+    private final MainFrame parent;
 
     private Timer slideTimer;
     private Timer animationTimer;
+
+    // --- ADDED: Admin Logic Variables ---
+    private boolean isAdminTriggered = false;
 
     public LandingPanel(MainFrame parent) {
         this.parent = parent;
@@ -27,12 +34,13 @@ public class LandingPanel {
 
         SwingUtilities.invokeLater(() -> {
             setupTimers();
-            setupButtonListener();
+            setupButtonListener(); // Logic modified here
             btnStyle();
         });
     }
 
     private void createUIComponents() {
+        // KEPT EXACTLY AS IS
         bgPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -46,6 +54,8 @@ public class LandingPanel {
 
     private void loadImages() {
         try {
+            // Using class resource loader is safer for JARs, but keeping your logic logic if you prefer
+            // Adjusted to use your specific paths
             image.add(new ImageIcon("resources/Manila.png").getImage());
             image.add(new ImageIcon("resources/Bohol.png").getImage());
             image.add(new ImageIcon("resources/Cebu.png").getImage());
@@ -90,15 +100,51 @@ public class LandingPanel {
 
     private void setupButtonListener() {
         if (btnBook != null) {
-            btnBook.addActionListener(e -> {
-                stopTimers();
-                parent.goToBooking();
+            Timer holdTimer = new Timer(2000, e -> {
+                isAdminTriggered = true;
+                String pwd = JOptionPane.showInputDialog(mainPanel, "Admin Access:\nEnter Password:");
+                try {
+                    verifyAdminAccess(pwd);
+                    stopTimers();
+                    parent.showAdmin();
+                } catch (AdminAccessException ex) {
+                    JOptionPane.showMessageDialog(mainPanel, ex.getMessage(), "Admin Denied", JOptionPane.ERROR_MESSAGE);
+                }
+            });
+            holdTimer.setRepeats(false);
 
+            btnBook.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    isAdminTriggered = false;
+                    holdTimer.start();
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    holdTimer.stop();
+                    if (!isAdminTriggered) {
+                        stopTimers();
+                        parent.goToBooking();
+                    }
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    holdTimer.stop();
+                }
             });
         }
     }
 
+    // --- ADDED: Helper for Admin ---
+    private void verifyAdminAccess(String pass) throws AdminAccessException {
+        if(pass == null) throw new AdminAccessException("Login Cancelled.");
+        if(!"admin123".equals(pass)) throw new AdminAccessException("Incorrect Password.");
+    }
+
     private void drawSlideshow(Graphics g) {
+        // KEPT EXACTLY AS IS
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
@@ -139,6 +185,7 @@ public class LandingPanel {
         if (slideTimer != null) slideTimer.stop();
         if (animationTimer != null) animationTimer.stop();
     }
+
     public void btnStyle(){
         if (btnBook != null) {
             btnBook.setBackground(new Color(244, 208, 63));
@@ -170,7 +217,6 @@ public class LandingPanel {
                     Graphics2D g2 = (Graphics2D) g.create();
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                             RenderingHints.VALUE_ANTIALIAS_ON);
-
                     g2.setColor(b.getBackground());
                     g2.fillRoundRect(0, 0, c.getWidth(), c.getHeight(), 25, 25);
 
