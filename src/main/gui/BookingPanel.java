@@ -155,7 +155,6 @@ public class BookingPanel {
                     "No " + busType + " buses available for " + dest + ".", "Route Unavailable", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
         controller.goToSelection(dest, busType, pType, date, pName);
     }
 

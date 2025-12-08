@@ -86,7 +86,6 @@ public class AdminPanel {
         table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
     }
 
-
     public void refreshLogs(){
         model.setRowCount(0);
         try{
