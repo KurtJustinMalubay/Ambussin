@@ -1,6 +1,8 @@
 package main.gui;
 
 import javax.swing.*;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.util.List;
 import java.util.ArrayList;
@@ -28,7 +30,26 @@ public class LandingPanel {
         SwingUtilities.invokeLater(() -> {
             setupTimers();
             setupButtonListener();
-            btnStyle();
+
+            if (bgPanel != null) {
+                bgPanel.addAncestorListener(new AncestorListener() {
+                    @Override
+                    public void ancestorAdded(AncestorEvent event) {
+                        if (slideTimer != null && !slideTimer.isRunning()) {
+                            slideTimer.start();
+                        }
+                    }
+
+                    @Override
+                    public void ancestorRemoved(AncestorEvent event) {
+                        stopTimers();
+                    }
+
+                    @Override
+                    public void ancestorMoved(AncestorEvent event) {
+                    }
+                });
+            }
         });
     }
 
@@ -42,6 +63,39 @@ public class LandingPanel {
         };
         bgPanel.setLayout(null);
         bgPanel.setOpaque(true);
+
+        btnBook = new JButton("Search Scheds") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                if (getModel().isPressed()) {
+                    g2.setColor(new Color(200, 170, 50));
+                } else if (getModel().isRollover()) {
+                    g2.setColor(new Color(255, 225, 100));
+                } else {
+                    g2.setColor(new Color(244, 208, 63));
+                }
+
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+
+                g2.setColor(getForeground());
+                FontMetrics fm = g2.getFontMetrics();
+                Rectangle stringBounds = fm.getStringBounds(this.getText(), g2).getBounds();
+                int textX = (getWidth() - stringBounds.width) / 2;
+                int textY = (getHeight() - stringBounds.height) / 2 + fm.getAscent();
+
+                g2.drawString(getText(), textX, textY);
+                g2.dispose();
+            }
+        };
+        btnBook.setFont(new Font("Arial", Font.BOLD, 16));
+        btnBook.setForeground(Color.BLACK);
+        btnBook.setFocusPainted(false);
+        btnBook.setBorderPainted(false);
+        btnBook.setContentAreaFilled(false);
+        btnBook.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
     private void loadImages() {
@@ -51,19 +105,22 @@ public class LandingPanel {
             image.add(new ImageIcon("resources/Cebu.png").getImage());
             image.add(new ImageIcon("resources/Davao.png").getImage());
         } catch (Exception e) {
-            System.err.println("Error loading images: " + e.getMessage());
+            System.err.println(e.getMessage());
         }
     }
 
     private void setupTimers() {
-        slideTimer = new Timer(2000, e -> {
+        slideTimer = new Timer(3000, e -> {
             if (!image.isEmpty() && !isAnimating) {
-                startSlideAnimation();
+                isAnimating = true;
+                slideOffset = 0;
+                nextIndex = (currentIndex + 1) % image.size();
+                if (animationTimer != null) animationTimer.start();
             }
         });
         slideTimer.start();
 
-        animationTimer = new Timer(15, e -> {
+        animationTimer = new Timer(30, e -> {
             if (isAnimating) {
                 slideOffset += 0.04f;
 
@@ -72,6 +129,7 @@ public class LandingPanel {
                     isAnimating = false;
                     currentIndex = nextIndex;
                     nextIndex = (nextIndex + 1) % image.size();
+                    ((Timer)e.getSource()).stop();
                 }
 
                 if (bgPanel != null) {
@@ -79,13 +137,6 @@ public class LandingPanel {
                 }
             }
         });
-        animationTimer.start();
-    }
-
-    private void startSlideAnimation() {
-        isAnimating = true;
-        slideOffset = 0;
-        nextIndex = (currentIndex + 1) % image.size();
     }
 
     private void setupButtonListener() {
@@ -106,13 +157,6 @@ public class LandingPanel {
         if (image.isEmpty()) {
             g2d.setColor(Color.DARK_GRAY);
             g2d.fillRect(0, 0, bgPanel.getWidth(), bgPanel.getHeight());
-            g2d.setColor(Color.WHITE);
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
-            String msg = "Loading images...";
-            FontMetrics fm = g2d.getFontMetrics();
-            int x = (bgPanel.getWidth() - fm.stringWidth(msg)) / 2;
-            int y = bgPanel.getHeight() / 2;
-            g2d.drawString(msg, x, y);
             return;
         }
 
@@ -135,56 +179,7 @@ public class LandingPanel {
     }
 
     public void stopTimers() {
-        if (slideTimer != null) slideTimer.stop();
-        if (animationTimer != null) animationTimer.stop();
-    }
-    public void btnStyle(){
-        if (btnBook != null) {
-            btnBook.setBackground(new Color(244, 208, 63));
-            btnBook.setForeground(Color.BLACK);
-            btnBook.setFont(new Font("Arial", Font.BOLD, 16));
-            btnBook.setFocusPainted(false);
-            btnBook.setContentAreaFilled(false);
-            btnBook.setBorderPainted(false);
-            btnBook.setOpaque(false);
-
-            btnBook.addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseEntered(java.awt.event.MouseEvent evt) {
-                    btnBook.setBackground(new Color(247, 220, 111));
-                    btnBook.repaint();
-                }
-
-                @Override
-                public void mouseExited(java.awt.event.MouseEvent evt) {
-                    btnBook.setBackground(new Color(244, 208, 63));
-                    btnBook.repaint();
-                }
-            });
-
-            btnBook.setUI(new javax.swing.plaf.basic.BasicButtonUI() {
-                @Override
-                public void paint(Graphics g, JComponent c) {
-                    AbstractButton b = (AbstractButton) c;
-                    Graphics2D g2 = (Graphics2D) g.create();
-                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                            RenderingHints.VALUE_ANTIALIAS_ON);
-
-                    g2.setColor(b.getBackground());
-                    g2.fillRoundRect(0, 0, c.getWidth(), c.getHeight(), 25, 25);
-
-
-                    g2.setColor(b.getForeground());
-                    g2.setFont(b.getFont());
-                    FontMetrics fm = g2.getFontMetrics();
-                    String text = b.getText();
-                    int x = (c.getWidth() - fm.stringWidth(text)) / 2;
-                    int y = (c.getHeight() + fm.getAscent() - fm.getDescent()) / 2;
-                    g2.drawString(text, x, y);
-
-                    g2.dispose();
-                }
-            });
-        }
+        if (slideTimer != null && slideTimer.isRunning()) slideTimer.stop();
+        if (animationTimer != null && animationTimer.isRunning()) animationTimer.stop();
     }
 }

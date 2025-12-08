@@ -155,12 +155,31 @@ public class SelectionPanel {
         seatContainer.setBorder(new EmptyBorder(15, 15, 15, 15));
         seatContainer.setLayout(new GridLayout(b.getRows(), b.getCols(), 5, 5));
 
+
+        int passengerSeatsCounted = 0;
+        int maxSeats = 37;
+
         for (int r = 0; r < b.getRows(); r++) {
             for (int c = 0; c < b.getCols(); c++) {
 
                 boolean isDriver = (r == 0 && c == 0);
+                boolean isFrontRowEmpty = (r == 0 && c > 0);
                 int middleCol = b.getCols() / 2;
                 boolean isAisle = (c == middleCol && r != b.getRows() - 1);
+
+                boolean isExcessSeat = (!isDriver && !isFrontRowEmpty && !isAisle && passengerSeatsCounted >= maxSeats);
+
+                if (isAisle || isFrontRowEmpty || isExcessSeat) {
+                    JPanel spacer = new JPanel();
+                    spacer.setOpaque(false);
+                    seatContainer.add(spacer);
+                    continue;
+                }
+
+
+                if (!isDriver) {
+                    passengerSeatsCounted++;
+                }
 
                 RoundedButton btn = new RoundedButton("");
                 btn.setRadius(8);
@@ -175,13 +194,6 @@ public class SelectionPanel {
                     btn.setText("\u2388");
                     btn.setForeground(Color.BLACK);
                     btn.setFont(new Font("Segoe UI Symbol", Font.BOLD, 18));
-                }
-                else if (isAisle) {
-                    btn.setOpaque(false);
-                    btn.setContentAreaFilled(false);
-                    btn.setBorderPainted(false);
-                    btn.setEnabled(false);
-                    btn.setNormalColor(new Color(0,0,0,0));
                 }
                 else if (!b.isSeatAvailable(r, c)) {
                     btn.setNormalColor(COLOR_TAKEN);
