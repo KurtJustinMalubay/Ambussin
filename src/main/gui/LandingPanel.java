@@ -1,7 +1,11 @@
 package main.gui;
 
+import main.exceptions.AdminAccessException;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -15,36 +19,15 @@ public class LandingPanel {
     private int nextIndex = 1;
     private float slideOffset = 0;
     private boolean isAnimating = false;
-    private MainFrame parent;
-
     private Timer slideTimer;
     private Timer animationTimer;
+    private boolean isAdminTriggered = false;
 
-    public LandingPanel(MainFrame parent) {
-        this.parent = parent;
+    private MainFrame controller;
 
-        loadImages();
+    public LandingPanel(MainFrame controller) {
+        this.controller = controller;
 
-        SwingUtilities.invokeLater(() -> {
-            setupTimers();
-            setupButtonListener();
-            btnStyle();
-        });
-    }
-
-    private void createUIComponents() {
-        bgPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                drawSlideshow(g);
-            }
-        };
-        bgPanel.setLayout(null);
-        bgPanel.setOpaque(true);
-    }
-
-    private void loadImages() {
         try {
             image.add(new ImageIcon("resources/Manila.png").getImage());
             image.add(new ImageIcon("resources/Bohol.png").getImage());
@@ -53,7 +36,49 @@ public class LandingPanel {
         } catch (Exception e) {
             System.err.println("Error loading images: " + e.getMessage());
         }
+
+        adminAccess();
+
+        SwingUtilities.invokeLater(() -> {
+            setupTimers();
+            setupButtonListener();
+        });
     }
+
+   private void adminAccess(){
+        Timer holdtimer = new Timer(2000, event -> {
+            isAdminTriggered = true;
+            String pwd = JOptionPane.showInputDialog(mainPanel, "Admin Access:\nEnter password:");
+            try{
+               verifyAdminAccess(pwd);
+               controller.showAdmin();
+            }catch (AdminAccessException ex){
+                JOptionPane.showMessageDialog(mainPanel, ex.getMessage(), "Admin Denied", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        holdtimer.setRepeats(false);
+
+        btnBook.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e){
+                isAdminTriggered = false;
+                holdtimer.start();
+            }
+            @Override
+            public void mouseReleased(MouseEvent e){
+                holdtimer.stop();
+                if(!isAdminTriggered) controller.goToBooking();
+            }
+            @Override
+            public void mouseClicked(MouseEvent e) { holdtimer.stop(); }
+        });
+   }
+
+   private void verifyAdminAccess(String pwd) throws AdminAccessException{
+        if(pwd == null) throw new AdminAccessException("Login Cancelled.");
+        if(!"admin123".equals(pwd)) throw new AdminAccessException("Incorrect password.");
+   }
+
 
     private void setupTimers() {
         slideTimer = new Timer(2000, e -> {
@@ -92,7 +117,7 @@ public class LandingPanel {
         if (btnBook != null) {
             btnBook.addActionListener(e -> {
                 stopTimers();
-                parent.goToBooking();
+                controller.goToBooking();
             });
         }
     }
@@ -130,61 +155,26 @@ public class LandingPanel {
         }
     }
 
-    public JPanel getMainPanel() {
-        return mainPanel;
-    }
-
-    public void stopTimers() {
+    private void stopTimers() {
         if (slideTimer != null) slideTimer.stop();
         if (animationTimer != null) animationTimer.stop();
     }
-    public void btnStyle(){
-        if (btnBook != null) {
-            btnBook.setBackground(new Color(244, 208, 63));
-            btnBook.setForeground(Color.BLACK);
-            btnBook.setFont(new Font("Arial", Font.BOLD, 16));
-            btnBook.setFocusPainted(false);
-            btnBook.setContentAreaFilled(false);
-            btnBook.setBorderPainted(false);
-            btnBook.setOpaque(false);
 
-            btnBook.addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseEntered(java.awt.event.MouseEvent evt) {
-                    btnBook.setBackground(new Color(247, 220, 111));
-                    btnBook.repaint();
-                }
-
-                @Override
-                public void mouseExited(java.awt.event.MouseEvent evt) {
-                    btnBook.setBackground(new Color(244, 208, 63));
-                    btnBook.repaint();
-                }
-            });
-
-            btnBook.setUI(new javax.swing.plaf.basic.BasicButtonUI() {
-                @Override
-                public void paint(Graphics g, JComponent c) {
-                    AbstractButton b = (AbstractButton) c;
-                    Graphics2D g2 = (Graphics2D) g.create();
-                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                            RenderingHints.VALUE_ANTIALIAS_ON);
-
-                    g2.setColor(b.getBackground());
-                    g2.fillRoundRect(0, 0, c.getWidth(), c.getHeight(), 25, 25);
-
-
-                    g2.setColor(b.getForeground());
-                    g2.setFont(b.getFont());
-                    FontMetrics fm = g2.getFontMetrics();
-                    String text = b.getText();
-                    int x = (c.getWidth() - fm.stringWidth(text)) / 2;
-                    int y = (c.getHeight() + fm.getAscent() - fm.getDescent()) / 2;
-                    g2.drawString(text, x, y);
-
-                    g2.dispose();
-                }
-            });
-        }
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+        btnBook = new main.gui.components.RoundedButton("Book Now").setNormalColor(new Color(244, 208, 63))
+                .setHoverColor(new Color(255, 225, 100))
+                .setPressedColor(new Color(200, 170, 50));
+        bgPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                drawSlideshow(g);
+            }
+        };
+        bgPanel.setLayout(null);
+        bgPanel.setOpaque(true);
     }
+
+    public JPanel getMainPanel() {return mainPanel;}
 }
