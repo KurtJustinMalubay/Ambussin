@@ -1,32 +1,24 @@
 package main.gui;
 
-import main.exceptions.AdminAccessException;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.ArrayList;
-import java.net.URL; // Added import for resource loading
 
 public class LandingPanel {
     private JPanel mainPanel;
     private JPanel bgPanel;
     private JButton btnBook;
 
-    private final List<Image> image = new ArrayList<>();
+    private List<Image> image = new ArrayList<>();
     private int currentIndex = 0;
     private int nextIndex = 1;
     private float slideOffset = 0;
     private boolean isAnimating = false;
-    private final MainFrame parent;
+    private MainFrame parent;
 
     private Timer slideTimer;
     private Timer animationTimer;
-
-    // --- Admin Logic Variables ---
-    private boolean isAdminTriggered = false;
 
     public LandingPanel(MainFrame parent) {
         this.parent = parent;
@@ -40,13 +32,7 @@ public class LandingPanel {
         });
     }
 
-    // --- FIX IS HERE ---
     private void createUIComponents() {
-        // 1. Initialize Main Panel (Best practice to prevent NPEs on root)
-        mainPanel = new JPanel();
-        mainPanel.setLayout(new BorderLayout());
-
-        // 2. Initialize Background Panel
         bgPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -54,43 +40,30 @@ public class LandingPanel {
                 drawSlideshow(g);
             }
         };
-        // Use GridBagLayout to center the button easily
-        bgPanel.setLayout(new GridBagLayout());
+        bgPanel.setLayout(null);
         bgPanel.setOpaque(true);
-
-        // 3. CRITICAL FIX: Initialize the Button here!
-        // If "Custom Create" is checked in the form, this must exist.
-        btnBook = new JButton("Book Now");
     }
 
     private void loadImages() {
         try {
-            // Using getClass().getResource is safer for exported JARs
-            String[] paths = {"/Manila.png", "/Bohol.png", "/Cebu.png", "/Davao.png"};
-
-            for(String path : paths){
-                URL url = getClass().getResource(path);
-                // Fallback if looking in specific folder structure
-                if(url == null) url = getClass().getResource("/resources" + path);
-
-                if(url != null) {
-                    image.add(new ImageIcon(url).getImage());
-                }
-            }
+            image.add(new ImageIcon("resources/Manila.png").getImage());
+            image.add(new ImageIcon("resources/Bohol.png").getImage());
+            image.add(new ImageIcon("resources/Cebu.png").getImage());
+            image.add(new ImageIcon("resources/Davao.png").getImage());
         } catch (Exception e) {
             System.err.println("Error loading images: " + e.getMessage());
         }
     }
 
     private void setupTimers() {
-        slideTimer = new Timer(3000, e -> { // Increased to 3s for better viewing
+        slideTimer = new Timer(2000, e -> {
             if (!image.isEmpty() && !isAnimating) {
                 startSlideAnimation();
             }
         });
         slideTimer.start();
 
-        animationTimer = new Timer(16, e -> { // ~60 FPS
+        animationTimer = new Timer(15, e -> {
             if (isAnimating) {
                 slideOffset += 0.04f;
 
@@ -117,54 +90,11 @@ public class LandingPanel {
 
     private void setupButtonListener() {
         if (btnBook != null) {
-            Timer holdTimer = new Timer(2000, e -> {
-                isAdminTriggered = true;
-                // Stop UI timers while showing the dialog to prevent lag
+            btnBook.addActionListener(e -> {
                 stopTimers();
-                String pwd = JOptionPane.showInputDialog(mainPanel, "Admin Access:\nEnter Password:");
-
-                // Restart timers after dialog closes (optional, or handle inside try/catch)
-                if(pwd == null) { setupTimers(); }
-
-                try {
-                    verifyAdminAccess(pwd);
-                    stopTimers(); // Stop permanently if going to Admin
-                    parent.showAdmin();
-                } catch (AdminAccessException ex) {
-                    // Wrong password, restart animation
-                    setupTimers();
-                    JOptionPane.showMessageDialog(mainPanel, ex.getMessage(), "Admin Denied", JOptionPane.ERROR_MESSAGE);
-                }
-            });
-            holdTimer.setRepeats(false);
-
-            btnBook.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    isAdminTriggered = false;
-                    holdTimer.start();
-                }
-
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    holdTimer.stop();
-                    if (!isAdminTriggered) {
-                        stopTimers();
-                        parent.goToBooking();
-                    }
-                }
-
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    holdTimer.stop();
-                }
+                parent.goToBooking();
             });
         }
-    }
-
-    private void verifyAdminAccess(String pass) throws AdminAccessException {
-        if(pass == null) throw new AdminAccessException("Login Cancelled.");
-        if(!"admin123".equals(pass)) throw new AdminAccessException("Incorrect Password.");
     }
 
     private void drawSlideshow(Graphics g) {
@@ -173,21 +103,21 @@ public class LandingPanel {
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                 RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        int width = bgPanel.getWidth();
-        int height = bgPanel.getHeight();
-
         if (image.isEmpty()) {
-            g2d.setColor(new Color(84, 120, 125)); // Fallback color
-            g2d.fillRect(0, 0, width, height);
+            g2d.setColor(Color.DARK_GRAY);
+            g2d.fillRect(0, 0, bgPanel.getWidth(), bgPanel.getHeight());
             g2d.setColor(Color.WHITE);
             g2d.setFont(new Font("Arial", Font.BOLD, 20));
             String msg = "Loading images...";
             FontMetrics fm = g2d.getFontMetrics();
-            int x = (width - fm.stringWidth(msg)) / 2;
-            int y = height / 2;
+            int x = (bgPanel.getWidth() - fm.stringWidth(msg)) / 2;
+            int y = bgPanel.getHeight() / 2;
             g2d.drawString(msg, x, y);
             return;
         }
+
+        int width = bgPanel.getWidth();
+        int height = bgPanel.getHeight();
 
         if (isAnimating) {
             int currentX = (int) (-width * slideOffset);
@@ -208,10 +138,8 @@ public class LandingPanel {
         if (slideTimer != null) slideTimer.stop();
         if (animationTimer != null) animationTimer.stop();
     }
-
     public void btnStyle(){
         if (btnBook != null) {
-            // Apply custom Button UI for rounded effect
             btnBook.setBackground(new Color(244, 208, 63));
             btnBook.setForeground(Color.BLACK);
             btnBook.setFont(new Font("Arial", Font.BOLD, 16));
@@ -220,10 +148,20 @@ public class LandingPanel {
             btnBook.setBorderPainted(false);
             btnBook.setOpaque(false);
 
-            // Set dimensions if needed
-            btnBook.setPreferredSize(new Dimension(200, 50));
+            btnBook.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseEntered(java.awt.event.MouseEvent evt) {
+                    btnBook.setBackground(new Color(247, 220, 111));
+                    btnBook.repaint();
+                }
 
-            // Custom painting for the button to make it rounded
+                @Override
+                public void mouseExited(java.awt.event.MouseEvent evt) {
+                    btnBook.setBackground(new Color(244, 208, 63));
+                    btnBook.repaint();
+                }
+            });
+
             btnBook.setUI(new javax.swing.plaf.basic.BasicButtonUI() {
                 @Override
                 public void paint(Graphics g, JComponent c) {
@@ -232,16 +170,9 @@ public class LandingPanel {
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                             RenderingHints.VALUE_ANTIALIAS_ON);
 
-                    // Hover effect logic handled by BasicButtonUI via model state
-                    if(b.getModel().isRollover()) {
-                        g2.setColor(new Color(255, 225, 100));
-                    } else if (b.getModel().isPressed()) {
-                        g2.setColor(new Color(200, 170, 50));
-                    } else {
-                        g2.setColor(b.getBackground());
-                    }
-
+                    g2.setColor(b.getBackground());
                     g2.fillRoundRect(0, 0, c.getWidth(), c.getHeight(), 25, 25);
+
 
                     g2.setColor(b.getForeground());
                     g2.setFont(b.getFont());
