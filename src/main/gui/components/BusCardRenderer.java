@@ -1,13 +1,14 @@
 package main.gui.components;
 
-import main.models.AirconBus;
+import main.managers.DataManager;
 import main.models.Bus;
 import main.models.Vehicle;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class BusCardRenderer extends JPanel implements ListCellRenderer<Vehicle> {
     private JLabel lblId = new JLabel();
@@ -16,7 +17,8 @@ public class BusCardRenderer extends JPanel implements ListCellRenderer<Vehicle>
     private JPanel cardContent = new JPanel(new BorderLayout());
     private static final List<String> SCHEDULE = genTimeSlots();
 
-    // Para generate rani og time frames sa bus [Dummy Time]
+    private String selectedDateForCounting = "";
+
     private static List<String> genTimeSlots(){
         List<String> times = new ArrayList<>();
         for(int hour = 6; hour <= 22; hour++){
@@ -58,23 +60,38 @@ public class BusCardRenderer extends JPanel implements ListCellRenderer<Vehicle>
         add(cardContent, BorderLayout.CENTER);
     }
 
+    public void setDateToCount(String date) {
+        this.selectedDateForCounting = date;
+    }
+
     @Override
     public Component getListCellRendererComponent(JList<? extends Vehicle> list, Vehicle value, int index, boolean isSelected, boolean cellHasFocus) {
         Bus b = (Bus) value;
         lblId.setText(b.getVehicleID());
 
-        int cap = (b instanceof AirconBus) ? 41 : 49;
-        int open = 0;
-        for(int r=0; r<b.getRows(); r++){
-            for(int c=0; c<b.getCols(); c++)
-                if(b.isSeatAvailable(r,c)) open++;
+        List<Point> bookedSeats = new ArrayList<>();
+        if (selectedDateForCounting != null && !selectedDateForCounting.isEmpty()) {
+            bookedSeats = DataManager.getInstance().getBookedSeats(b.getVehicleID(), selectedDateForCounting);
         }
-        lblSeats.setText(open + "/" + cap);
 
-        // Dummy Time Cycling
+        int capacity = 0;
+        int available = 0;
+
+        for (int r = 0; r < b.getRows(); r++) {
+            for (int c = 0; c < b.getCols(); c++) {
+                if (b.isSeatAvailable(r, c)) {
+                    capacity++;
+
+                    if (!bookedSeats.contains(new Point(r, c))) {
+                        available++;
+                    }
+                }
+            }
+        }
+
+        lblSeats.setText(available + "/" + capacity);
         lblTime.setText(SCHEDULE.get(index % SCHEDULE.size()));
 
-        // Card design
         if (isSelected) {
             cardContent.setBackground(new Color(230, 245, 255));
             cardContent.setBorder(BorderFactory.createLineBorder(new Color(0, 120, 215), 2));

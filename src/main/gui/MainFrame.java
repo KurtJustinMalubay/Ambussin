@@ -24,7 +24,7 @@ public class MainFrame extends JFrame {
         /*TEST*/
         Dimension screen = getToolkit().getScreenSize();
         Dimension preferred = new Dimension(1024, 756);
-        setSize(screen);
+        setSize(preferred);
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);

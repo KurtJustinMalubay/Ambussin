@@ -5,10 +5,8 @@ import main.managers.DataManager;
 import main.managers.PassengerFactory;
 import main.models.Bus;
 import main.models.Passenger;
-import main.models.Vehicle;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class TicketPanel {
@@ -25,11 +23,8 @@ public class TicketPanel {
     private String pType;
     private double finalPrice;
     private String date;
-
-    // 1. New field for Name
     private String passengerName;
 
-    // 2. Updated Constructor to accept 'name'
     public TicketPanel(Window parentWindow, MainFrame controller, Bus v, int r, int c, String pType, String date, String name) {
         this.parentWindow = parentWindow;
         this.controller = controller;
@@ -38,7 +33,7 @@ public class TicketPanel {
         this.col = c;
         this.pType = pType;
         this.date = date;
-        this.passengerName = name; // Store it
+        this.passengerName = name;
 
         initStyling();
         displayData();
@@ -63,7 +58,6 @@ public class TicketPanel {
     }
 
     private void displayData() {
-        // Use the actual name for the factory (optional, but good practice)
         Passenger p = PassengerFactory.createPassenger(pType, passengerName, 0);
         this.finalPrice = p.computeFare(vehicle.getBasePrice());
 
@@ -72,13 +66,12 @@ public class TicketPanel {
         gbc.insets = new Insets(5, 0, 5, 0);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // 3. Added "Name" to the display and adjusted row numbers (0 to 7)
         addDetailRow(detailsPanel, gbc, 0, "Name:", passengerName);
         addDetailRow(detailsPanel, gbc, 1, "Date:", date);
         addDetailRow(detailsPanel, gbc, 2, "BusID:", vehicle.getVehicleID());
         addDetailRow(detailsPanel, gbc, 3, "BusType:", vehicle.getVehicleType());
         addDetailRow(detailsPanel, gbc, 4, "PassengerType:", pType);
-        addDetailRow(detailsPanel, gbc, 5, "Destination:", ((Bus)vehicle).getDestination());
+        addDetailRow(detailsPanel, gbc, 5, "Destination:", vehicle.getDestination());
         addDetailRow(detailsPanel, gbc, 6, "Seat:", (row+1) + "-" + (col+1));
         addDetailRow(detailsPanel, gbc, 7, "Price:", String.format("%.2f", finalPrice));
     }
@@ -98,7 +91,9 @@ public class TicketPanel {
 
     private void confirmBooking() {
         try {
-            vehicle.bookSeat(row, col);
+            // --- FIX: REMOVED vehicle.bookSeat(row, col) ---
+            // We only save to CSV. We do NOT modify the Bus object in memory.
+            // This ensures that when you change dates, the seat is not "stuck" as taken.
 
             DataManager.getInstance().saveTransaction(
                     vehicle.getVehicleID(),
@@ -112,9 +107,6 @@ public class TicketPanel {
             parentWindow.dispose();
             JOptionPane.showMessageDialog(null, "Ticket Created Successfully!");
             controller.goToLanding();
-        } catch (InvalidSeatException e){
-            JOptionPane.showMessageDialog(mainPanel, "Booking Failed: " + e.getMessage(), "Seat Error", JOptionPane.ERROR_MESSAGE);
-            parentWindow.dispose();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(mainPanel, "Error: " + e.getMessage());
         }

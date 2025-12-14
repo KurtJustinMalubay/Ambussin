@@ -16,23 +16,26 @@ public abstract class Bus extends Vehicle {
         this.basePrice = basePrice;
         this.capacity = capacity;
 
-        int sFront = cols;
-        int sBack = cols - 1;
+        int seatsInBackRow = cols;
+        int seatsPerMiddleRow = cols - 1;
+        int remainingCapacity = capacity - seatsInBackRow;
+        int middleRows = (int) Math.ceil((double) remainingCapacity / seatsPerMiddleRow);
 
-        int remainingCap = capacity - sFront;
-        int backRows = (int) Math.ceil((double) remainingCap / sBack);
-        int rows = backRows + 1;
+        int totalRows = 1 + middleRows + 1;
 
-        this.seats = new boolean[rows][cols];
-        for(int i = 0; i < rows; i++){
-            for(int j = 0; j < cols; j++){
-                this.seats[i][j] = true;
+        this.seats = new boolean[totalRows][cols];
+
+        for(int r = 0; r < totalRows; r++){
+            for(int c = 0; c < cols; c++){
+                if (r == 0) {
+                    this.seats[r][c] = true; // Back Row
+                } else if (r == totalRows - 1) {
+                    this.seats[r][c] = false; // Driver Row
+                } else {
+                    int middleCol = cols / 2;
+                    this.seats[r][c] = (c != middleCol); // Middle rows (skip aisle)
+                }
             }
-        }
-
-        int middleSeats = cols / 2;
-        for(int i = 1; i < rows; i++){
-            this.seats[i][middleSeats] = false;
         }
     }
 
@@ -41,15 +44,9 @@ public abstract class Bus extends Vehicle {
     public String getDestination(){return destination;}
     public double getBasePrice(){return basePrice;}
     public boolean isSeatAvailable(int r, int c){return seats[r][c];}
+
     public void bookSeat(int r, int c) throws InvalidSeatException {
-        if(r < 0 || r >= getRows() || c < 0 || c >= getCols()){
-            throw new InvalidSeatException("Error: Seat out of bounds.");
-        }
-        if(!seats[r][c]){
-            throw new InvalidSeatException("Seat " + (r+1) + "-" + (c+1) + " is already occupied.");
-        }
         seats[r][c] = false;
     }
     public String getVehicleType(){return "Bus";}
-
 }

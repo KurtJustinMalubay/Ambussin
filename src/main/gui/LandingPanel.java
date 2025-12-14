@@ -9,6 +9,7 @@ public class LandingPanel {
     private JPanel mainPanel;
     private JPanel bgPanel;
     private JButton btnBook;
+    private JPanel buttonPannel;
 
     private List<Image> image = new ArrayList<>();
     private int currentIndex = 0;
@@ -33,6 +34,10 @@ public class LandingPanel {
     }
 
     private void createUIComponents() {
+        mainPanel = new JPanel();
+        buttonPannel = new JPanel();
+        btnBook = new JButton();
+
         bgPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -138,6 +143,7 @@ public class LandingPanel {
         if (slideTimer != null) slideTimer.stop();
         if (animationTimer != null) animationTimer.stop();
     }
+
     public void btnStyle(){
         if (btnBook != null) {
             btnBook.setBackground(new Color(244, 208, 63));

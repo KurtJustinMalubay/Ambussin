@@ -5,6 +5,8 @@ import main.models.Vehicle;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.time.format.DateTimeFormatter;
@@ -40,7 +42,6 @@ public class BookingPanel {
         setupDateSelector();
         setupNameField();
 
-        // Destinations
         setupAutoRemovePlaceholder(cmbDest, DEST_PLACEHOLDER);
         Set<String> dests = new HashSet<>();
         for (Vehicle v : vehicles) {
@@ -50,7 +51,6 @@ public class BookingPanel {
         }
         for (String d : dests) cmbDest.addItem(d);
 
-        // Passenger Types
         setupAutoRemovePlaceholder(cmbPassenger, TYPE_PLACEHOLDER);
         cmbPassenger.addItem("Regular");
         cmbPassenger.addItem("Student");
@@ -59,39 +59,35 @@ public class BookingPanel {
 
         stylePlaceholders();
 
-        // Setup Radio Button Group
         ButtonGroup bg = new ButtonGroup();
         bg.add(rbAircon); bg.add(rbStandard);
 
-        // Listener for Destination changes
         cmbDest.addActionListener(e -> {
             SwingUtilities.invokeLater(this::updateBusTypeAvailability);
         });
 
         btnSearch.addActionListener(e -> search());
 
-        // --- APPLY DEFAULT STATE ON STARTUP ---
         resetForm();
     }
 
-    /**
-     * Resets all fields to their default "Placeholder" state.
-     */
     public void resetForm() {
-        nameField.setText(NAME_PLACEHOLDER);
-        nameField.setForeground(Color.GRAY);
+        if (nameField != null) {
+            nameField.setText(NAME_PLACEHOLDER);
+            nameField.setForeground(Color.GRAY);
+        }
 
-        resetComboBox(cmbDate, DATE_PLACEHOLDER);
-        resetComboBox(cmbDest, DEST_PLACEHOLDER);
-        resetComboBox(cmbPassenger, TYPE_PLACEHOLDER);
+        if (cmbDate != null) resetComboBox(cmbDate, DATE_PLACEHOLDER);
+        if (cmbDest != null) resetComboBox(cmbDest, DEST_PLACEHOLDER);
+        if (cmbPassenger != null) resetComboBox(cmbPassenger, TYPE_PLACEHOLDER);
 
-        rbAircon.setEnabled(false);
-        rbStandard.setEnabled(false);
+        if (rbAircon != null) rbAircon.setEnabled(false);
+        if (rbStandard != null) rbStandard.setEnabled(false);
 
-        ButtonGroup bg = ((DefaultButtonModel)rbAircon.getModel()).getGroup();
-        if(bg != null) bg.clearSelection();
-
-        if (mainPanel != null) mainPanel.repaint();
+        if (rbAircon != null) {
+            ButtonGroup bg = ((DefaultButtonModel)rbAircon.getModel()).getGroup();
+            if(bg != null) bg.clearSelection();
+        }
     }
 
     private void resetComboBox(JComboBox<String> box, String placeholder) {
@@ -139,9 +135,6 @@ public class BookingPanel {
 
         if (hasAircon && !hasStandard) rbAircon.setSelected(true);
         else if (!hasAircon && hasStandard) rbStandard.setSelected(true);
-        else if (hasAircon && hasStandard) {
-            if (!rbAircon.isSelected() && !rbStandard.isSelected()) rbAircon.setSelected(true);
-        }
     }
 
     private void setupNameField() {
@@ -255,19 +248,28 @@ public class BookingPanel {
     }
 
     public void reloadData(List<Vehicle> vehicles) {
+        this.allVehicles = vehicles;
         cmbDest.removeAllItems();
         Set<String> dests = new HashSet<>();
         for (Vehicle v : vehicles) {
             if (v instanceof Bus) { dests.add(((Bus) v).getDestination()); }
         }
         for(String d : dests) cmbDest.addItem(d);
-
         resetForm();
     }
 
     public JPanel getMainPanel() { return mainPanel; }
 
     private void createUIComponents() {
+        mainPanel = new JPanel();
+
+        mainPanel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                resetForm();
+            }
+        });
+
         JTextField txtName = new JTextField();
         txtName.setPreferredSize(new Dimension(250, 25));
         txtName.setFont(new Font("Arial", Font.PLAIN, 14));
