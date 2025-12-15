@@ -40,12 +40,12 @@ The project follows a strict **Model-View-Controller (MVC)** architecture to ens
 ## Design Patterns Implemented
 
 ### 1. Singleton Pattern
-* **Where:** `main.managers.DataManager`
-* **Why:** We need a single point of truth for accessing the CSV files (`buses.csv` and `transactions.csv`). The Singleton pattern ensures that only one instance of the file reader/writer exists, preventing resource conflicts and data corruption during concurrent file access.
+* `main.managers.DataManager`
+* We need a single point of truth for accessing the CSV files (`buses.csv` and `transactions.csv`). The Singleton pattern ensures that only one instance of the file reader/writer exists, preventing resource conflicts and data corruption during concurrent file access.
 
 ### 2. Factory Pattern (Creational)
-* **Where:** `main.managers.VehicleFactory` & `main.managers.PassengerFactory`
-* **Why:**
+* `main.managers.VehicleFactory` & `main.managers.PassengerFactory`
+* **Factories:**
     * **VehicleFactory:** Decouples the creation logic from the data loading. It reads raw CSV strings and decides whether to instantiate an `AirconBus` (Fixed 41 Capacity) or `StandardBus` (Fixed 49 Capacity).
     * **PassengerFactory:** Encapsulates the logic for creating passenger types. The GUI simply requests a passenger based on the dropdown string ("Student", "Regular"), and the Factory handles the correct object instantiation.
 
@@ -57,8 +57,8 @@ The project follows a strict **Model-View-Controller (MVC)** architecture to ens
 Ambussin/
 ├── buses.csv                # Config file (Blueprint of the fleet)
 ├── transactions.csv         # Log file (Generated automatically)
+├── resources/               # Assets (Images, Icons) - Marked as Resource Root
 ├── src/
-│   ├── resources/           # Assets (Images, Icons) - Marked as Resource Root
 │   └── main/
 │       ├── Main.java        # Entry Point
 │       ├── exceptions/      # Custom Exceptions (AdminAccess, InvalidSeat, etc.)
