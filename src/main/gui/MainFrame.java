@@ -55,7 +55,12 @@ public class MainFrame extends JFrame {
         goToLanding();
     }
 
-    public void goToLanding() { cards.show(mainPanel, "LANDING"); }
+    // In MainFrame.java
+
+    public void goToLanding() {
+        landing.startTimers();
+        cards.show(mainPanel, "LANDING");
+    }
     public void goToBooking() {
         booking.resetForm();
         cards.show(mainPanel, "BOOKING");

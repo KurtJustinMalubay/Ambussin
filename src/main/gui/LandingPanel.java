@@ -1,7 +1,11 @@
 package main.gui;
 
+import main.exceptions.AdminAccessException; // Make sure you have this class, or change to Exception
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -21,6 +25,9 @@ public class LandingPanel {
     private Timer slideTimer;
     private Timer animationTimer;
 
+    // Logic field from your old code
+    private boolean isAdminTriggered = false;
+
     public LandingPanel(MainFrame parent) {
         this.parent = parent;
 
@@ -28,8 +35,8 @@ public class LandingPanel {
 
         SwingUtilities.invokeLater(() -> {
             setupTimers();
-            setupButtonListener();
-            btnStyle();
+            btnStyle(); // Applies the visual style
+            adminAccess(); // Applies the logic (Long Press)
         });
     }
 
@@ -48,6 +55,81 @@ public class LandingPanel {
         bgPanel.setLayout(null);
         bgPanel.setOpaque(true);
     }
+    public void startTimers() {
+        if (slideTimer != null && !slideTimer.isRunning()) {
+            slideTimer.start();
+        }
+        if (animationTimer != null && !animationTimer.isRunning()) {
+            animationTimer.start();
+        }
+    }
+    // --- LOGIC FROM YOUR OLD CODE ---
+    private void adminAccess() {
+        // 1. The Timer that waits 2 seconds
+        Timer holdtimer = new Timer(2000, event -> {
+            isAdminTriggered = true;
+            stopTimers(); // Stop slideshow when entering dialog
+
+            String pwd = JOptionPane.showInputDialog(mainPanel, "Admin Access:\nEnter password:");
+            try {
+                verifyAdminAccess(pwd);
+                parent.showAdmin();
+            } catch (AdminAccessException ex) {
+                JOptionPane.showMessageDialog(mainPanel, ex.getMessage(), "Admin Denied", JOptionPane.ERROR_MESSAGE);
+                // Restart slideshow if failed
+                if (slideTimer != null) slideTimer.start();
+            } catch (Exception ex) {
+                // Fallback for general errors
+                JOptionPane.showMessageDialog(mainPanel, "Access Denied", "Admin Denied", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        holdtimer.setRepeats(false);
+
+        // 2. The Mouse Listener
+        btnBook.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                isAdminTriggered = false;
+                holdtimer.start();
+
+                // Visual feedback for press
+                btnBook.setBackground(new Color(247, 220, 111));
+                btnBook.repaint();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                holdtimer.stop();
+                if (!isAdminTriggered) {
+                    stopTimers();
+                    parent.goToBooking();
+                }
+
+                // Visual feedback for release
+                btnBook.setBackground(new Color(244, 208, 63));
+                btnBook.repaint();
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                holdtimer.stop();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                // Safety: Stop timer if mouse leaves button while holding
+                holdtimer.stop();
+                btnBook.setBackground(new Color(244, 208, 63));
+                btnBook.repaint();
+            }
+        });
+    }
+
+    private void verifyAdminAccess(String pwd) throws AdminAccessException {
+        if (pwd == null) throw new AdminAccessException("Login Cancelled.");
+        if (!"admin123".equals(pwd)) throw new AdminAccessException("Incorrect password.");
+    }
+    // -------------------------------
 
     private void loadImages() {
         try {
@@ -93,15 +175,6 @@ public class LandingPanel {
         nextIndex = (currentIndex + 1) % image.size();
     }
 
-    private void setupButtonListener() {
-        if (btnBook != null) {
-            btnBook.addActionListener(e -> {
-                stopTimers();
-                parent.goToBooking();
-            });
-        }
-    }
-
     private void drawSlideshow(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
 
@@ -144,6 +217,8 @@ public class LandingPanel {
         if (animationTimer != null) animationTimer.stop();
     }
 
+    // Using your Custom Style method instead of an external RoundedButton class
+    // to ensure the button looks nice in this specific panel.
     public void btnStyle(){
         if (btnBook != null) {
             btnBook.setBackground(new Color(244, 208, 63));
@@ -153,20 +228,6 @@ public class LandingPanel {
             btnBook.setContentAreaFilled(false);
             btnBook.setBorderPainted(false);
             btnBook.setOpaque(false);
-
-            btnBook.addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseEntered(java.awt.event.MouseEvent evt) {
-                    btnBook.setBackground(new Color(247, 220, 111));
-                    btnBook.repaint();
-                }
-
-                @Override
-                public void mouseExited(java.awt.event.MouseEvent evt) {
-                    btnBook.setBackground(new Color(244, 208, 63));
-                    btnBook.repaint();
-                }
-            });
 
             btnBook.setUI(new javax.swing.plaf.basic.BasicButtonUI() {
                 @Override
