@@ -111,7 +111,7 @@ public class AdminPanel {
             JOptionPane.showMessageDialog(mainPanel, "Please enter a destination.");
             return;
         }
-        if(type == null || type.trim().isEmpty() ||  type.equals(TYPE_PLACEHOLDER)){
+        if(type.trim().isEmpty() || type.equals(TYPE_PLACEHOLDER)){
             JOptionPane.showMessageDialog(mainPanel, "Please enter a valid type.");
             return;
         }
@@ -124,10 +124,13 @@ public class AdminPanel {
         }
 
         if(id.startsWith("AC") && !type.equals("AIRCON")){
-            JOptionPane.showMessageDialog(mainPanel, "Please enter a valid type.", "Type Mismatch", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(mainPanel, "BusType must align with the BusID.", "Type Mismatch", JOptionPane.WARNING_MESSAGE);
             return;
         }else if(id.startsWith("ORD") && !type.equals("STANDARD")){
-            JOptionPane.showMessageDialog(mainPanel, "Please enter a valid type.", "Type Mismatch", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(mainPanel, "BusType must align with the BusID", "Type Mismatch", JOptionPane.WARNING_MESSAGE);
+            return;
+        }else if (!id.startsWith("AC") && !id.startsWith("ORD")){
+            JOptionPane.showMessageDialog(mainPanel, "BusID must start with 'AC' or 'ORD'.", "Invalid BusID", JOptionPane.WARNING_MESSAGE);
             return;
         }
 

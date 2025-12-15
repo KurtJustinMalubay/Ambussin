@@ -13,48 +13,30 @@ public class LandingPanel {
     private JPanel mainPanel;
     private JPanel bgPanel;
     private JButton btnBook;
-    private JPanel buttonPannel;
+
+    private Timer slideTimer;
+    private Timer animationTimer;
+
+    private MainFrame controller;
 
     private List<Image> image = new ArrayList<>();
     private int currentIndex = 0;
     private int nextIndex = 1;
     private float slideOffset = 0;
     private boolean isAnimating = false;
-    private MainFrame parent;
-
-    private Timer slideTimer;
-    private Timer animationTimer;
-
-    // Logic field from your old code
     private boolean isAdminTriggered = false;
 
-    public LandingPanel(MainFrame parent) {
-        this.parent = parent;
+    public LandingPanel(MainFrame controller) {
+        this.controller = controller;
 
         loadImages();
+        adminAccess();
 
         SwingUtilities.invokeLater(() -> {
             setupTimers();
-            btnStyle(); // Applies the visual style
-            adminAccess(); // Applies the logic (Long Press)
         });
     }
 
-    private void createUIComponents() {
-        mainPanel = new JPanel();
-        buttonPannel = new JPanel();
-        btnBook = new JButton();
-
-        bgPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                drawSlideshow(g);
-            }
-        };
-        bgPanel.setLayout(null);
-        bgPanel.setOpaque(true);
-    }
     public void startTimers() {
         if (slideTimer != null && !slideTimer.isRunning()) {
             slideTimer.start();
@@ -68,12 +50,11 @@ public class LandingPanel {
         // 1. The Timer that waits 2 seconds
         Timer holdtimer = new Timer(2000, event -> {
             isAdminTriggered = true;
-            stopTimers(); // Stop slideshow when entering dialog
 
             String pwd = JOptionPane.showInputDialog(mainPanel, "Admin Access:\nEnter password:");
             try {
                 verifyAdminAccess(pwd);
-                parent.showAdmin();
+                controller.showAdmin();
             } catch (AdminAccessException ex) {
                 JOptionPane.showMessageDialog(mainPanel, ex.getMessage(), "Admin Denied", JOptionPane.ERROR_MESSAGE);
                 // Restart slideshow if failed
@@ -91,36 +72,18 @@ public class LandingPanel {
             public void mousePressed(MouseEvent e) {
                 isAdminTriggered = false;
                 holdtimer.start();
-
-                // Visual feedback for press
-                btnBook.setBackground(new Color(247, 220, 111));
-                btnBook.repaint();
             }
-
             @Override
             public void mouseReleased(MouseEvent e) {
                 holdtimer.stop();
                 if (!isAdminTriggered) {
                     stopTimers();
-                    parent.goToBooking();
+                    controller.goToBooking();
                 }
-
-                // Visual feedback for release
-                btnBook.setBackground(new Color(244, 208, 63));
-                btnBook.repaint();
             }
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                holdtimer.stop();
-            }
-
             @Override
             public void mouseExited(MouseEvent e) {
-                // Safety: Stop timer if mouse leaves button while holding
                 holdtimer.stop();
-                btnBook.setBackground(new Color(244, 208, 63));
-                btnBook.repaint();
             }
         });
     }
@@ -208,50 +171,28 @@ public class LandingPanel {
         }
     }
 
-    public JPanel getMainPanel() {
-        return mainPanel;
-    }
-
     public void stopTimers() {
         if (slideTimer != null) slideTimer.stop();
         if (animationTimer != null) animationTimer.stop();
     }
 
-    // Using your Custom Style method instead of an external RoundedButton class
-    // to ensure the button looks nice in this specific panel.
-    public void btnStyle(){
-        if (btnBook != null) {
-            btnBook.setBackground(new Color(244, 208, 63));
-            btnBook.setForeground(Color.BLACK);
-            btnBook.setFont(new Font("Arial", Font.BOLD, 16));
-            btnBook.setFocusPainted(false);
-            btnBook.setContentAreaFilled(false);
-            btnBook.setBorderPainted(false);
-            btnBook.setOpaque(false);
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+        btnBook = new main.gui.components.RoundedButton("Book Now").setNormalColor(new Color(244, 208, 63))
+                .setHoverColor(new Color(255, 225, 100))
+                .setPressedColor(new Color(200, 170, 50))
+                .setBorderColor(Color.BLACK);
 
-            btnBook.setUI(new javax.swing.plaf.basic.BasicButtonUI() {
-                @Override
-                public void paint(Graphics g, JComponent c) {
-                    AbstractButton b = (AbstractButton) c;
-                    Graphics2D g2 = (Graphics2D) g.create();
-                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                            RenderingHints.VALUE_ANTIALIAS_ON);
-
-                    g2.setColor(b.getBackground());
-                    g2.fillRoundRect(0, 0, c.getWidth(), c.getHeight(), 25, 25);
-
-
-                    g2.setColor(b.getForeground());
-                    g2.setFont(b.getFont());
-                    FontMetrics fm = g2.getFontMetrics();
-                    String text = b.getText();
-                    int x = (c.getWidth() - fm.stringWidth(text)) / 2;
-                    int y = (c.getHeight() + fm.getAscent() - fm.getDescent()) / 2;
-                    g2.drawString(text, x, y);
-
-                    g2.dispose();
-                }
-            });
-        }
+        bgPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                drawSlideshow(g);
+            }
+        };
+        bgPanel.setLayout(null);
+        bgPanel.setOpaque(true);
     }
+
+    public JPanel getMainPanel() {return mainPanel;}
 }

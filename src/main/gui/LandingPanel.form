@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="main.gui.LandingPanel">
-  <grid id="27dc6" binding="mainPanel" custom-create="true" layout-manager="BorderLayout" hgap="0" vgap="0">
+  <grid id="27dc6" binding="mainPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
       <xy x="20" y="20" width="500" height="433"/>
     </constraints>
@@ -51,6 +51,7 @@
               <enabled value="true"/>
               <focusPainted value="false"/>
               <focusable value="true"/>
+              <font size="16"/>
               <opaque value="false"/>
               <preferredSize width="200" height="40"/>
               <text value="Book Now"/>
